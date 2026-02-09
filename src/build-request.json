@@ -1,58 +1,67 @@
 {
   "kind": "build_request",
-  "title": "Fix disappearing card when dragging from stacked foundation piles",
-  "priority": "high",
+  "title": "Lock foundation piles (upper four slots) to prevent any interaction/move-out",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-15",
-      "text": "Investigate and fix the bug where dragging/moving the top card from one of the four foundation piles (after the foundation has multiple cards stacked/overlapped) can cause the dragged/moved card to disappear from the UI.",
+      "id": "REQ-17",
+      "text": "Make all cards in the four foundation piles (upper slots) permanently non-interactive (“locked”): players must not be able to select, click, or drag cards from foundations after they are placed there, while still allowing valid drops onto foundations from the waste/tableau.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages"
+          "msg-1"
         ],
         "quotes": [
-          "When stacked cards in the upper four slots are put in a stacked state, then moved, the card disappears entirely. Can you determine why this is?"
+          "Still having the disappearing issue. Let's try: Once a card is stacked in the upper four slots they are incapable of interaction and will remain \"locked\"."
         ]
       },
       "acceptanceCriteria": [
-        "Repro case no longer occurs: with 2+ cards in a foundation, dragging the top card to a valid destination (tableau or another foundation when rules allow) results in the card appearing in the destination and the source foundation showing the next card underneath (or the empty-slot placeholder when emptied).",
-        "If the drag from a foundation pile is canceled (dropped outside any valid drop zone) the card does not disappear; the source foundation still shows the same top card as before the drag.",
-        "If the drag from a foundation pile is dropped onto an invalid target, the move is canceled and the card does not disappear; the source foundation remains unchanged.",
-        "No other piles (waste/tableau) regress in drag-and-drop behavior or rendering."
+        "Clicking a foundation pile that contains cards does not create a selection and does not attempt any move from foundation.",
+        "Dragging from a foundation pile is not possible (no drag cursor/affordance; no drag payload created).",
+        "Dropping a valid card from waste/tableau onto a foundation still works exactly as before.",
+        "Undo still works for moves into foundations (undo can remove cards from foundations), but users still cannot directly move cards out of foundations via interaction.",
+        "Hint does not suggest any move whose source is a foundation pile (no hints that require interacting with foundations as a source)."
       ]
     },
     {
-      "id": "REQ-16",
-      "text": "Harden foundation pile rendering so React reconciliation cannot incorrectly unmount/lose the rendered card when the foundation top card changes during a move (e.g., ensure stable, card-identity-based keys for rendered cards where applicable, including foundation top-card rendering).",
+      "id": "REQ-18",
+      "text": "Add a small visual “locked” affordance/state to foundation top cards to make it clear they cannot be interacted with (without changing the overall dark theme), and ensure hover/active styling does not imply interactivity for foundation cards.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages"
+          "msg-1"
         ],
         "quotes": [
-          "the card disappears entirely"
+          "Once a card is stacked in the upper four slots they are incapable of interaction and will remain \"locked\"."
         ]
       },
       "acceptanceCriteria": [
-        "When repeatedly moving cards off a foundation pile (one by one), each newly revealed top card renders reliably (no blank/empty foundation container while cards remain).",
-        "When moving cards onto a foundation pile (building up), the visible top card always matches the last card in that foundation array.",
-        "There are no React console warnings about missing/unstable keys in pile/card rendering during typical play (dealing, drawing, dragging between piles)."
+        "Foundation cards do not show hover scale/active press effects that imply click/drag interaction.",
+        "A subtle locked visual state is visible on foundation top cards (e.g., reduced hover effects + small lock indicator/overlay), and it does not affect tableau/waste card styling.",
+        "Waste and tableau interactivity (click, drag, hover styling) remains unchanged."
       ]
     }
   ],
   "constraints": [
-    "Frontend must not modify any files under frontend/src/components/ui or any paths listed in frontend.immutablePaths in SYSTEM_CONTEXT.",
-    "Keep the backend as-is (single-actor Motoko canister is currently minimal and not involved in solitaire state).",
-    "Use English for any user-facing text."
+    "Do not edit any files under frontend/src/components/ui or any frontend immutablePaths listed in SYSTEM_CONTEXT.",
+    "Keep backend as a single Motoko actor; no backend changes are required for this request."
   ],
   "nonGoals": [
-    "Adding new game modes/rules beyond Klondike.",
-    "Adding animations or new visual themes as part of this fix (unless required to resolve the disappearance bug).",
-    "Implementing persistence or backend storage for game state."
+    "Do not implement alternative fixes for the disappearing foundation drag bug that still allow moving cards out of foundations; foundations must remain locked per request.",
+    "Do not add new game modes, scoring, timers, or additional solitaire rule variants."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

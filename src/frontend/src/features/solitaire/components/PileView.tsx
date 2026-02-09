@@ -23,6 +23,7 @@ interface PileViewProps {
   isDraggable?: (index: number) => boolean;
   isDropTarget?: boolean;
   isDraggedOver?: boolean;
+  isFoundationLocked?: boolean;
 }
 
 export default function PileView({
@@ -44,6 +45,7 @@ export default function PileView({
   isDraggable,
   isDropTarget = false,
   isDraggedOver = false,
+  isFoundationLocked = false,
 }: PileViewProps) {
   const showEmpty = isEmpty && cards.length === 0;
   
@@ -176,29 +178,28 @@ export default function PileView({
         <div key={topCard.id}>
           <CardView
             card={topCard}
-            onClick={onCardClick ? () => onCardClick(topIndex) : undefined}
+            onClick={undefined}
             isSelected={selectedIndex === topIndex}
             isHinted={hintedIndex === topIndex || hintedIndex === -1}
-            draggable={canDrag}
-            onDragStart={canDrag ? handleCardDragStart(topIndex) : undefined}
-            onDragEnd={canDrag ? handleCardDragEnd : undefined}
+            draggable={false}
+            onDragStart={undefined}
+            onDragEnd={undefined}
+            isLocked={isFoundationLocked}
           />
         </div>
       </div>
     );
   }
   
-  // Tableau pile: vertical offset
-  const height = cards.length > 0 ? 112 + (cards.length - 1) * tableauOffset : 112;
-  
+  // Tableau pile: vertical stack
   return (
     <div
-      className={cn(
-        'relative transition-all',
-        isDraggedOver && 'scale-105',
-        className
-      )}
-      style={{ width: '80px', height: `${height}px`, minHeight: '112px' }}
+      className={cn('relative', className)}
+      style={{
+        width: '80px',
+        height: cards.length > 0 ? `${112 + (cards.length - 1) * tableauOffset}px` : '112px',
+        minHeight: '112px',
+      }}
       onDragOver={handleDropZoneDragOver}
       onDragLeave={handleDropZoneDragLeave}
       onDrop={handleDropZoneDrop}
@@ -218,7 +219,7 @@ export default function PileView({
           >
             <CardView
               card={card}
-              onClick={onCardClick ? () => onCardClick(index) : undefined}
+              onClick={card.faceUp && onCardClick ? () => onCardClick(index) : undefined}
               isSelected={selectedIndex === index}
               isHinted={hintedIndex === index || (hintedIndex === -1 && index === cards.length)}
               draggable={canDrag}

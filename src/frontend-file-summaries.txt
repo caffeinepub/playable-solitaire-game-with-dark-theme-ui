@@ -3,17 +3,17 @@
   "frontend/src/features/solitaire/solitaireTypes.ts": "TypeScript type definitions for cards, suits, ranks, game state, selections, hints, and drag payloads with helper functions for card properties.",
   "frontend/src/features/solitaire/solitaireLogic.ts": "Core game logic including deck creation, shuffling, dealing, move validation for tableau and foundation piles, and stock drawing mechanics.",
   "frontend/src/features/solitaire/solitaireHistory.ts": "Undo history management with functions to create, push, and pop game states for the undo feature.",
-  "frontend/src/features/solitaire/solitaireHint.ts": "Hint system that scans the current game state to find valid moves from waste, tableau, and foundation piles.",
+  "frontend/src/features/solitaire/solitaireHint.ts": "Hint system that scans for valid moves from waste and tableau only, explicitly excluding foundation piles as sources per the locked foundation requirement.",
   "frontend/src/features/solitaire/solitaireWin.ts": "Win condition checker that verifies if all 52 cards are correctly placed in the four foundation piles.",
   "frontend/src/features/solitaire/useSolitaireGame.ts": "React hook managing complete game state machine with move validation that returns null for invalid moves, ensuring UI state is cleared even when moves fail so cards remain in their original locations.",
-  "frontend/src/features/solitaire/components/CardView.tsx": "Card rendering component displaying face-up cards with suit/rank or face-down cards with emerald gradient back design, supporting selection, hint highlighting, drag-and-drop with draggable/onDragStart/onDragEnd props, and optional custom positioning via style prop.",
-  "frontend/src/features/solitaire/components/PileView.tsx": "Reusable pile component with full drag-and-drop support that now uses stable card.id-based React keys for all card rendering (foundation, waste, and tableau) to ensure proper reconciliation when cards are moved or removed.",
+  "frontend/src/features/solitaire/components/CardView.tsx": "Card rendering component with support for locked state that displays a lock icon, removes hover/active effects, and prevents all interaction for foundation cards.",
+  "frontend/src/features/solitaire/components/PileView.tsx": "Reusable pile component that renders foundation cards with locked state (no click/drag handlers) while maintaining full drag-and-drop support for waste and tableau piles.",
   "frontend/src/features/solitaire/components/GameControls.tsx": "Control bar with New Game, Undo, and Hint buttons using shadcn Button components.",
   "frontend/src/features/solitaire/components/WinDialog.tsx": "Victory modal dialog using shadcn Dialog component with trophy icon and play again button.",
-  "frontend/src/features/solitaire/SolitairePage.tsx": "Main game page layout with drag-and-drop lifecycle management including document-level drop handlers to catch invalid drops, drag session tracking with refs, and proper drag-over state clearing for all drop zones with enhanced cleanup on canceled drops.",
+  "frontend/src/features/solitaire/SolitairePage.tsx": "Main game page that prevents foundation piles from being used as drag or click sources while keeping them as valid drop targets, with isFoundationDraggable returning a simple function that always returns false for locked foundations.",
   "frontend/index.css": "Global styles with OKLCH-based dark theme using slate/amber color palette with proper contrast for card readability.",
   "frontend/src/lib/utils.ts": "Utility function for merging Tailwind CSS classes using clsx and tailwind-merge.",
   "frontend/src/hooks/useQueries.ts": "Empty placeholder file as the Solitaire game uses only client-side logic without backend queries.",
   "frontend/src/index.css": "Global styles with Tailwind directives and OKLCH-based dark theme using slate/amber color palette with proper contrast for the Solitaire game.",
-  "frontend/src/features/solitaire/solitaireDrag.ts": "Utility module for serializing/deserializing drag payloads, managing DataTransfer operations, and validating drag sources for the drag-and-drop functionality."
+  "frontend/src/features/solitaire/solitaireDrag.ts": "Drag utility module that now rejects any drag payload with foundation as source type during deserialization and validation, ensuring foundations cannot be dragged from."
 }

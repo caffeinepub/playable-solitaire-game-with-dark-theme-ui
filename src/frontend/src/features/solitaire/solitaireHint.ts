@@ -64,6 +64,9 @@ export function findHint(state: GameState): HintData | null {
     }
   }
   
+  // NOTE: Foundation piles are locked - never suggest moves FROM foundations
+  // This ensures hints never use foundation as a source
+  
   // Check if can draw from stock
   if (state.stock.length > 0) {
     return {

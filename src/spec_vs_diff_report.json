@@ -1,15 +1,18 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-09T20:26:50.999Z",
-  "summary": "Diff appears focused on fixing drag-and-drop disappearance from foundation piles by (1) using stable React keys based on card identity in PileView and (2) improving drag lifecycle handling and drop-cancellation cleanup in SolitairePage (including document-level drop handling). No clear unrequested feature additions are evident from the provided diff summary.",
+  "generatedAt": "2026-02-09T20:34:42.845Z",
+  "summary": "Diff implements locked foundations by preventing click/selection and drag initiation from foundation piles, rejecting foundation drag payloads at the drag utility layer, and updating the hint system to never suggest moves whose source is a foundation. It also adds a visual locked affordance (lock icon + non-interactive styling) via a new `isLocked` prop on `CardView` (but the provided `PileView.tsx` diff is truncated, so propagation of `isLocked` specifically to foundation top cards cannot be fully verified from the excerpt).",
   "missing_requirements": [],
   "hallucinated_features": [],
-  "confidence": 0.62,
+  "confidence": 0.66,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/features/solitaire/SolitairePage.tsx",
+    "frontend/src/features/solitaire/components/CardView.tsx",
     "frontend/src/features/solitaire/components/PileView.tsx",
+    "frontend/src/features/solitaire/solitaireDrag.ts",
+    "frontend/src/features/solitaire/solitaireHint.ts",
     "project_state.json"
   ]
 }

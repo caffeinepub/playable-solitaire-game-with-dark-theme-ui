@@ -1,48 +1,59 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Solitaire: Fix foundation drag disappearance + stabilize foundation rendering keys",
+  "title": "Lock foundation piles to disable interaction while keeping valid drops",
   "requirements": [
     {
-      "id": "REQ-15",
-      "summary": "Fix the UI bug where dragging the top card from a multi-card foundation can cause the card to disappear after valid/invalid/canceled drags.",
+      "id": "REQ-17",
+      "summary": "Prevent selecting/clicking/dragging cards out of foundation piles while still allowing valid drops into foundations, undo for foundation moves, and hints that never use foundation as a source.",
       "acceptanceCriteria": [
-        "Repro case no longer occurs: with 2+ cards in a foundation, dragging the top card to a valid destination (tableau or another foundation when rules allow) results in the card appearing in the destination and the source foundation showing the next card underneath (or the empty-slot placeholder when emptied).",
-        "If the drag from a foundation pile is canceled (dropped outside any valid drop zone) the card does not disappear; the source foundation still shows the same top card as before the drag.",
-        "If the drag from a foundation pile is dropped onto an invalid target, the move is canceled and the card does not disappear; the source foundation remains unchanged.",
-        "No other piles (waste/tableau) regress in drag-and-drop behavior or rendering."
+        "Clicking a foundation pile that contains cards does not create a selection and does not attempt any move from foundation.",
+        "Dragging from a foundation pile is not possible (no drag cursor/affordance; no drag payload created).",
+        "Dropping a valid card from waste/tableau onto a foundation still works exactly as before.",
+        "Undo still works for moves into foundations (undo can remove cards from foundations), but users still cannot directly move cards out of foundations via interaction.",
+        "Hint does not suggest any move whose source is a foundation pile (no hints that require interacting with foundations as a source)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/solitaire/components/PileView.tsx",
-          "operation": "modify",
-          "description": "Adjust foundation stack rendering to be resilient during HTML5 drag sessions (including when the top card changes after a move), ensuring the source foundation never temporarily renders blank/loses its top card. Use card-identity-based rendering (e.g., a wrapper keyed by the top card id) so the newly revealed top card reliably re-renders after a drag/move cycle."
-        },
-        {
           "path": "frontend/src/features/solitaire/SolitairePage.tsx",
           "operation": "modify",
-          "description": "Harden drag lifecycle handling for foundation drags: ensure drag session flags (dragSessionActive/dropHandled) and drag-over state are consistently cleared for canceled drops and invalid drops, without mutating game state. Confirm foundation drag start/drop paths do not inadvertently trigger UI state that could hide the source pile/card."
+          "description": "Update click/selection and drag wiring so foundation piles are locked as sources: do not allow selecting from foundations when no prior selection, never start drag sessions from foundations, but still allow foundations to act as drop targets and click targets when a non-foundation selection exists (to attempt a move into foundations). Ensure the drag/drop flow and undo UI remain unchanged."
+        },
+        {
+          "path": "frontend/src/features/solitaire/components/PileView.tsx",
+          "operation": "modify",
+          "description": "Adjust foundation pile rendering to avoid attaching click/drag handlers to the foundation top card for source interactions while preserving drop-zone handlers on the pile container. Ensure the foundation stack remains a valid drop target even when locked."
+        },
+        {
+          "path": "frontend/src/features/solitaire/solitaireDrag.ts",
+          "operation": "modify",
+          "description": "Harden drag source validation to reject any drag payload whose source type is 'foundation', preventing a drag payload from being treated as valid even if created externally (e.g., via browser/DOM quirks)."
+        },
+        {
+          "path": "frontend/src/features/solitaire/solitaireHint.ts",
+          "operation": "modify",
+          "description": "Confirm and enforce that hint generation never returns a hint whose from.type is 'foundation' (keep foundations as target-only). Add/adjust logic to exclude foundation-source scans if any exist now or are added later."
         }
       ]
     },
     {
-      "id": "REQ-16",
-      "summary": "Harden foundation pile rendering against React reconciliation issues by using stable, card-identity-based keys for pile/card rendering (especially foundation top-card).",
+      "id": "REQ-18",
+      "summary": "Add a subtle locked visual state for foundation top cards and remove hover/active cues implying interactivity, without affecting tableau/waste styling or the dark theme.",
       "acceptanceCriteria": [
-        "When repeatedly moving cards off a foundation pile (one by one), each newly revealed top card renders reliably (no blank/empty foundation container while cards remain).",
-        "When moving cards onto a foundation pile (building up), the visible top card always matches the last card in that foundation array.",
-        "There are no React console warnings about missing/unstable keys in pile/card rendering during typical play (dealing, drawing, dragging between piles)."
+        "Foundation cards do not show hover scale/active press effects that imply click/drag interaction.",
+        "A subtle locked visual state is visible on foundation top cards (e.g., reduced hover effects + small lock indicator/overlay), and it does not affect tableau/waste card styling.",
+        "Waste and tableau interactivity (click, drag, hover styling) remains unchanged."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/solitaire/components/PileView.tsx",
-          "operation": "modify",
-          "description": "Replace index-based React keys with stable card-identity keys where cards are mapped (tableau and waste visible cards), using each Card.id. For foundation rendering, ensure the rendered top card is keyed by card identity (e.g., key={topCard.id}) so React reliably replaces the DOM when the foundation top card changes."
-        },
-        {
           "path": "frontend/src/features/solitaire/components/CardView.tsx",
           "operation": "modify",
-          "description": "If needed to support stable keying/drag rendering, ensure CardView’s root element structure remains consistent across rerenders (faceUp/faceDown) so React can swap cards cleanly when keyed by Card.id, and confirm drag handlers do not rely on unstable indices."
+          "description": "Add a foundation-lock visual state (e.g., small lock indicator overlay on the top card) and adjust classes so when locked it uses non-interactive cursor and suppresses hover/active transform/press styles; keep existing styling unchanged for waste/tableau and other cards."
+        },
+        {
+          "path": "frontend/src/features/solitaire/components/PileView.tsx",
+          "operation": "modify",
+          "description": "Pass a dedicated 'locked' / 'interactionDisabled' flag to CardView for foundation top cards only, ensuring the locked styling applies only to foundation stacks and not to waste/tableau cards."
         }
       ]
     }

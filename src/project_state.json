@@ -1,10 +1,11 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 15,
+  "projectStateVersion": 17,
   "summary": "Build a simple playable solitaire game deployed to the user's personal canister, including a dark theme UI.",
   "architectural_notes": [
     "Drag-and-drop should validate drop targets; if drop is not on a valid stack location, the dragged card/run must revert to its pre-drag position/state.",
-    "Foundation (upper four slots) stacked/overlapped rendering must preserve correct z-index/positioning and draggable top-card visibility when moving cards; moving a stacked foundation card should not unmount or visually hide it."
+    "Foundation (upper four slots) stacked/overlapped rendering must preserve correct z-index/positioning and draggable top-card visibility when moving cards; moving a stacked foundation card should not unmount or visually hide it.",
+    "Consider a rules/UI mode where once a card is placed into a foundation slot it becomes locked (non-draggable/non-interactive) to prevent move-outs and avoid the foundation disappearing-card issue."
   ],
   "known_issues": [
     "Bug: Dragging some cards/runs and releasing them outside a valid drop target can leave them not stacked and not reverted to their original location.",
@@ -139,6 +140,22 @@
         "REQ-16"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-make-all-cards-in-the-four-foundation-piles-upper-slots-permanently-non-interactive-locked-players-must-not-be-able-to-select-click-or-drag-cards-from-foundations-after-they-are-placed-there-while-still-allowing-valid-drops-onto-foundations-from-the-waste-tableau",
+      "title": "Make all cards in the four foundation piles (upper slots) permanently non-interactive (“locked”): players must not be able to select, click, or drag cards from foundations after they are placed there, while still allowing valid drops onto foundations from the waste/tableau.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-small-visual-locked-affordance-state-to-foundation-top-cards-to-make-it-clear-they-cannot-be-interacted-with-without-changing-the-overall-dark-theme-and-ensure-hover-active-styling-does-not-imply-interactivity-for-foundation-cards",
+      "title": "Add a small visual “locked” affordance/state to foundation top cards to make it clear they cannot be interacted with (without changing the overall dark theme), and ensure hover/active styling does not imply interactivity for foundation cards.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -181,6 +198,12 @@
     {
       "id": "AR-7",
       "summary": "Change foundation pile visual stacking so newly placed ascending suit cards cover/overlap the previous lower card (instead of showing a fanned stack)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Make foundation (upper four slots) cards non-interactive once stacked there (locked), to avoid interaction/move-outs that can trigger disappearing behavior",
       "reqIds": [],
       "status": "pending"
     }

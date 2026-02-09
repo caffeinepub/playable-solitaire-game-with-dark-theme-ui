@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the UI bug where the top card can disappear when dragging from a foundation pile that has multiple stacked cards, and make foundation rendering robust during moves.
+**Goal:** Lock the four foundation piles (upper slots) so cards placed there cannot be clicked or dragged out, while still allowing valid drops into foundations.
 
 **Planned changes:**
-- Reproduce and diagnose the disappearing-card issue when dragging the top card from a multi-card foundation pile.
-- Fix drag-and-drop state/update flow for foundation-to-other-pile moves so the dragged card either lands correctly or returns to its source on canceled/invalid drops.
-- Harden foundation pile rendering to prevent React reconciliation issues (e.g., use stable, card-identity-based keys so the top card updates reliably as cards are moved on/off foundations).
-- Ensure no regressions in drag-and-drop behavior or rendering for waste and tableau piles.
+- Disable all pointer/drag interactions for cards in the four foundation piles (no click selection, no drag start/payload), while keeping drop targets for valid moves from waste/tableau.
+- Ensure game logic features respect the locked foundation rule: undo can still undo moves into foundations, and hints never suggest moves with a foundation as the source.
+- Add a subtle “locked” visual affordance on foundation top cards and remove hover/active styling that implies interactivity for foundation cards only (waste/tableau styling unchanged).
 
-**User-visible outcome:** Dragging the top card from a stacked foundation pile no longer causes the card to vanish; valid drops move the card and reveal the next foundation card, while canceled/invalid drops leave the foundation unchanged.
+**User-visible outcome:** Cards in the upper four foundation slots visibly appear locked and cannot be selected or dragged by the player, but players can still move appropriate cards onto foundations; undo continues to work for moves into foundations and hints won’t suggest moving from foundations.

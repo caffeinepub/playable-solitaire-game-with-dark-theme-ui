@@ -2,11 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-investigate-and-fix-the-bug-where-dragging-moving-the-top-card-from-one-of-the-four-foundation-piles-after-the-foundation-has-multiple-cards-stacked-overlapped-can-cause-the-dragged-moved-card-to-disappear-from-the-ui",
-      "featureTitle": "Investigate and fix the bug where dragging/moving the top card from one of the four foundation piles (after the foundation has multiple cards stacked/overlapped) can cause the dragged/moved card to disappear from the UI.",
+      "featureId": "feature-make-all-cards-in-the-four-foundation-piles-upper-slots-permanently-non-interactive-locked-players-must-not-be-able-to-select-click-or-drag-cards-from-foundations-after-they-are-placed-there-while-still-allowing-valid-drops-onto-foundations-from-the-waste-tableau",
+      "featureTitle": "Make all cards in the four foundation piles (upper slots) permanently non-interactive (“locked”): players must not be able to select, click, or drag cards from foundations after they are placed there, while still allowing valid drops onto foundations from the waste/tableau.",
       "files": [
         "frontend/src/features/solitaire/SolitairePage.tsx",
-        "frontend/src/features/solitaire/components/PileView.tsx"
+        "frontend/src/features/solitaire/components/PileView.tsx",
+        "frontend/src/features/solitaire/solitaireDrag.ts",
+        "frontend/src/features/solitaire/solitaireHint.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -16,14 +18,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-15"
+        "REQ-17"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-harden-foundation-pile-rendering-so-react-reconciliation-cannot-incorrectly-unmount-lose-the-rendered-card-when-the-foundation-top-card-changes-during-a-move-e-g-ensure-stable-card-identity-based-keys-for-rendered-cards-where-applicable-including-foundation-top-card-rendering",
-      "featureTitle": "Harden foundation pile rendering so React reconciliation cannot incorrectly unmount/lose the rendered card when the foundation top card changes during a move (e.g., ensure stable, card-identity-based keys for rendered cards where applicable, including foundation top-card rendering).",
+      "featureId": "feature-add-a-small-visual-locked-affordance-state-to-foundation-top-cards-to-make-it-clear-they-cannot-be-interacted-with-without-changing-the-overall-dark-theme-and-ensure-hover-active-styling-does-not-imply-interactivity-for-foundation-cards",
+      "featureTitle": "Add a small visual “locked” affordance/state to foundation top cards to make it clear they cannot be interacted with (without changing the overall dark theme), and ensure hover/active styling does not imply interactivity for foundation cards.",
       "files": [
+        "frontend/src/features/solitaire/components/CardView.tsx",
         "frontend/src/features/solitaire/components/PileView.tsx"
       ],
       "components": [
@@ -34,7 +37,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-16"
+        "REQ-18"
       ],
       "confidence": "high"
     }

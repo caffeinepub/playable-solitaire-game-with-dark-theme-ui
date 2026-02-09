@@ -11,6 +11,10 @@ export function deserializeDragPayload(data: string): DragPayload | null {
     const parsed = JSON.parse(data);
     if (!parsed || typeof parsed !== 'object') return null;
     if (!['waste', 'foundation', 'tableau'].includes(parsed.type)) return null;
+    
+    // Reject foundation sources - foundations are locked
+    if (parsed.type === 'foundation') return null;
+    
     return parsed as DragPayload;
   } catch {
     return null;
@@ -43,13 +47,13 @@ export function validateDragSource(
   foundations: unknown[][],
   tableau: unknown[][]
 ): boolean {
-  if (payload.type === 'waste') {
-    return wasteLength > 0;
+  // Foundation sources are never valid - foundations are locked
+  if (payload.type === 'foundation') {
+    return false;
   }
   
-  if (payload.type === 'foundation') {
-    if (payload.index === undefined || payload.index < 0 || payload.index >= 4) return false;
-    return foundations[payload.index].length > 0;
+  if (payload.type === 'waste') {
+    return wasteLength > 0;
   }
   
   if (payload.type === 'tableau') {

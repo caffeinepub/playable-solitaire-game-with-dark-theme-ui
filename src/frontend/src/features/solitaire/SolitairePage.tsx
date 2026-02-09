@@ -43,10 +43,10 @@ export default function SolitairePage() {
     }
     
     if (selection) {
-      // Try to move
+      // Try to move - foundations can be targets but not sources
       move(selection, newSelection);
     } else {
-      // Select
+      // Select - do NOT allow selecting from foundation piles
       if (type === 'waste' && gameState.waste.length > 0) {
         select(newSelection);
       } else if (type === 'tableau' && index !== undefined) {
@@ -54,9 +54,8 @@ export default function SolitairePage() {
         if (cardIndex !== undefined && cardIndex >= 0 && pile[cardIndex]?.faceUp) {
           select({ type, index, cardIndex });
         }
-      } else if (type === 'foundation' && index !== undefined && gameState.foundations[index].length > 0) {
-        select(newSelection);
       }
+      // Foundation selection removed - foundations are locked as sources
     }
   };
   
@@ -72,6 +71,12 @@ export default function SolitairePage() {
   
   // Drag and drop handlers
   const handleDragStart = (payload: DragPayload, event: React.DragEvent) => {
+    // Reject any drag from foundation piles
+    if (payload.type === 'foundation') {
+      event.preventDefault();
+      return;
+    }
+    
     setDragData(event, payload);
     clearUIState();
     dragSessionActive.current = true;
@@ -102,6 +107,11 @@ export default function SolitairePage() {
     
     const dragPayload = getDragData(event);
     if (!dragPayload) return;
+    
+    // Additional validation: reject foundation sources
+    if (dragPayload.type === 'foundation') {
+      return;
+    }
     
     const from = dragPayloadToSelection(dragPayload);
     const to: Selection = { type, index };
@@ -139,9 +149,9 @@ export default function SolitairePage() {
     return cardIndex >= 0 && cardIndex < pile.length && pile[cardIndex].faceUp;
   };
   
-  const isFoundationDraggable = (foundationIndex: number) => (cardIndex: number) => {
-    const foundation = gameState.foundations[foundationIndex];
-    return cardIndex === foundation.length - 1 && foundation.length > 0;
+  // Foundation cards are NEVER draggable - they are locked once placed
+  const isFoundationDraggable = () => {
+    return false;
   };
   
   return (
@@ -222,12 +232,13 @@ export default function SolitairePage() {
                   onDragOver={handleDragOver('foundation', index)}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop('foundation', index)}
-                  isDraggable={isFoundationDraggable(index)}
+                  isDraggable={isFoundationDraggable}
                   onDragStart={(cardIndex, event) => {
                     handleDragStart({ type: 'foundation', index, cardIndex }, event);
                   }}
                   onDragEnd={handleDragEnd}
                   isDraggedOver={dragOverTarget?.type === 'foundation' && dragOverTarget.index === index}
+                  isFoundationLocked={true}
                 />
               ))}
             </div>

@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-09T20:26:51.002Z",
+  "generatedAt": "2026-02-09T20:34:42.848Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,27 +11,32 @@
     "implemented": 2,
     "items": [
       {
-        "id": "REQ-15",
-        "summary": "Investigate and fix the bug where dragging/moving the top card from one of the four foundation piles (after the foundation has multiple cards stacked/overlapped) can cause the dragged/moved card to disappear from the UI.",
+        "id": "REQ-17",
+        "summary": "Make all cards in the four foundation piles (upper slots) permanently non-interactive (“locked”): players must not be able to select, click, or drag cards from foundations after they are placed there, while still allowing valid drops onto foundations from the waste/tableau.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/features/solitaire/SolitairePage.tsx",
           "frontend/src/features/solitaire/components/PileView.tsx",
-          "frontend/src/features/solitaire/SolitairePage.tsx"
+          "frontend/src/features/solitaire/solitaireDrag.ts",
+          "frontend/src/features/solitaire/solitaireHint.ts"
         ],
         "matchedFiles": [
+          "frontend/src/features/solitaire/SolitairePage.tsx",
           "frontend/src/features/solitaire/components/PileView.tsx",
-          "frontend/src/features/solitaire/SolitairePage.tsx"
+          "frontend/src/features/solitaire/solitaireDrag.ts",
+          "frontend/src/features/solitaire/solitaireHint.ts"
         ]
       },
       {
-        "id": "REQ-16",
-        "summary": "Harden foundation pile rendering so React reconciliation cannot incorrectly unmount/lose the rendered card when the foundation top card changes during a move (e.g., ensure stable, card-identity-based keys for rendered cards where applicable, including foundation top-card rendering).",
+        "id": "REQ-18",
+        "summary": "Add a small visual “locked” affordance/state to foundation top cards to make it clear they cannot be interacted with (without changing the overall dark theme), and ensure hover/active styling does not imply interactivity for foundation cards.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/solitaire/components/PileView.tsx",
-          "frontend/src/features/solitaire/components/CardView.tsx"
+          "frontend/src/features/solitaire/components/CardView.tsx",
+          "frontend/src/features/solitaire/components/PileView.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/features/solitaire/components/CardView.tsx",
           "frontend/src/features/solitaire/components/PileView.tsx"
         ]
       }
@@ -43,7 +48,10 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/features/solitaire/SolitairePage.tsx",
+    "frontend/src/features/solitaire/components/CardView.tsx",
     "frontend/src/features/solitaire/components/PileView.tsx",
+    "frontend/src/features/solitaire/solitaireDrag.ts",
+    "frontend/src/features/solitaire/solitaireHint.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
