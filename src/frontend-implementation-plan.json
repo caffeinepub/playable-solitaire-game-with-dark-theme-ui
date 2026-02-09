@@ -1,59 +1,85 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Lock foundation piles to disable interaction while keeping valid drops",
+  "title": "Per-playthrough results with local leaderboards for best time and best moves",
   "requirements": [
     {
-      "id": "REQ-17",
-      "summary": "Prevent selecting/clicking/dragging cards out of foundation piles while still allowing valid drops into foundations, undo for foundation moves, and hints that never use foundation as a source.",
+      "id": "REQ-25",
+      "summary": "Record exactly one completed-playthrough result on win, capturing elapsedSeconds and moves for that playthrough.",
       "acceptanceCriteria": [
-        "Clicking a foundation pile that contains cards does not create a selection and does not attempt any move from foundation.",
-        "Dragging from a foundation pile is not possible (no drag cursor/affordance; no drag payload created).",
-        "Dropping a valid card from waste/tableau onto a foundation still works exactly as before.",
-        "Undo still works for moves into foundations (undo can remove cards from foundations), but users still cannot directly move cards out of foundations via interaction.",
-        "Hint does not suggest any move whose source is a foundation pile (no hints that require interacting with foundations as a source)."
+        "When the win condition is reached, exactly one result entry is created for that playthrough (no duplicate entries due to re-renders).",
+        "Each recorded entry contains both elapsedSeconds and moves for that same playthrough.",
+        "Starting a New Game resets the in-progress timer and move counter as it does today, but does not delete previously recorded results."
       ],
       "file_operations": [
         {
           "path": "frontend/src/features/solitaire/SolitairePage.tsx",
           "operation": "modify",
-          "description": "Update click/selection and drag wiring so foundation piles are locked as sources: do not allow selecting from foundations when no prior selection, never start drag sessions from foundations, but still allow foundations to act as drop targets and click targets when a non-foundation selection exists (to attempt a move into foundations). Ensure the drag/drop flow and undo UI remain unchanged."
+          "description": "Capture elapsedSeconds from the existing useGameTimer hook and the current moves from solitaireHistory; on transition to isWon=true, add a single playthrough result using a ref/guard keyed by gameInstanceKey to prevent duplicate inserts across re-renders."
         },
         {
-          "path": "frontend/src/features/solitaire/components/PileView.tsx",
-          "operation": "modify",
-          "description": "Adjust foundation pile rendering to avoid attaching click/drag handlers to the foundation top card for source interactions while preserving drop-zone handlers on the pile container. Ensure the foundation stack remains a valid drop target even when locked."
-        },
-        {
-          "path": "frontend/src/features/solitaire/solitaireDrag.ts",
-          "operation": "modify",
-          "description": "Harden drag source validation to reject any drag payload whose source type is 'foundation', preventing a drag payload from being treated as valid even if created externally (e.g., via browser/DOM quirks)."
-        },
-        {
-          "path": "frontend/src/features/solitaire/solitaireHint.ts",
-          "operation": "modify",
-          "description": "Confirm and enforce that hint generation never returns a hint whose from.type is 'foundation' (keep foundations as target-only). Add/adjust logic to exclude foundation-source scans if any exist now or are added later."
+          "path": "frontend/src/features/solitaire/results/usePlaythroughResults.ts",
+          "operation": "create",
+          "description": "Implement a small results manager hook that exposes an addResult({ elapsedSeconds, moves }) API intended to be called only by the win flow; include internal dedupe support (e.g., caller-provided gameInstanceKey) so each playthrough is recorded once."
         }
       ]
     },
     {
-      "id": "REQ-18",
-      "summary": "Add a subtle locked visual state for foundation top cards and remove hover/active cues implying interactivity, without affecting tableau/waste styling or the dark theme.",
+      "id": "REQ-26",
+      "summary": "Persist recorded playthrough results in localStorage and load them on app start with safe defaults.",
       "acceptanceCriteria": [
-        "Foundation cards do not show hover scale/active press effects that imply click/drag interaction.",
-        "A subtle locked visual state is visible on foundation top cards (e.g., reduced hover effects + small lock indicator/overlay), and it does not affect tableau/waste card styling.",
-        "Waste and tableau interactivity (click, drag, hover styling) remains unchanged."
+        "After winning at least one game, reloading the page keeps the previously recorded results available to the UI.",
+        "Persisted data is resilient to an empty/missing storage value (no crashes; defaults to empty lists)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/solitaire/components/CardView.tsx",
+          "path": "frontend/src/features/solitaire/results/usePlaythroughResults.ts",
           "operation": "modify",
-          "description": "Add a foundation-lock visual state (e.g., small lock indicator overlay on the top card) and adjust classes so when locked it uses non-interactive cursor and suppresses hover/active transform/press styles; keep existing styling unchanged for waste/tableau and other cards."
+          "description": "Add localStorage-backed persistence: load initial results on first render (default to empty array on missing/invalid value) and write back whenever results change; keep storage purely client-side with no backend involvement."
+        }
+      ]
+    },
+    {
+      "id": "REQ-27",
+      "summary": "Derive and display two ranked leaderboards (Best Times and Best Moves) showing both metrics per playthrough, with empty states when no results exist.",
+      "acceptanceCriteria": [
+        "The Best Times list is sorted ascending by elapsed time (lower ranks higher).",
+        "The Best Moves list is sorted ascending by moves (fewer ranks higher).",
+        "Each displayed row clearly shows the playthrough’s time (HH:MM:SS) and moves value.",
+        "If there are no recorded results yet, the UI shows an English empty-state message for each list (e.g., \"No completed games yet.\")."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/solitaire/results/usePlaythroughResults.ts",
+          "operation": "modify",
+          "description": "Add derived selectors that compile two sorted arrays from stored results: bestTimes (ascending elapsedSeconds) and bestMoves (ascending moves); provide a shared HH:MM:SS formatter for display."
         },
         {
-          "path": "frontend/src/features/solitaire/components/PileView.tsx",
+          "path": "frontend/src/features/solitaire/components/WinDialog.tsx",
           "operation": "modify",
-          "description": "Pass a dedicated 'locked' / 'interactionDisabled' flag to CardView for foundation top cards only, ensuring the locked styling applies only to foundation stacks and not to waste/tableau cards."
+          "description": "Extend the win dialog UI to render two separate ranked lists (Best Times, Best Moves) sourced from stored results, ensuring each row shows HH:MM:SS and moves; include an English empty-state message for each list. Use existing shadcn-ui Dialog/Button composition patterns; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-28",
+      "summary": "Update the win dialog to show the current playthrough’s time and moves plus both leaderboards with English labels, preserving Play Again behavior.",
+      "acceptanceCriteria": [
+        "On win, the dialog shows the player’s completion time and moves for that win.",
+        "On win, the dialog shows both ranked lists (Best Times and Best Moves) populated from stored results.",
+        "All user-facing text added for this feature is in English.",
+        "The existing 'Play Again' action continues to start a new game as it does today."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/solitaire/SolitairePage.tsx",
+          "operation": "modify",
+          "description": "Wire the win dialog to receive the current playthrough metrics (formattedTime and/or elapsedSeconds, plus moves) along with derived leaderboard data from usePlaythroughResults; keep the existing handleNewGame behavior unchanged."
+        },
+        {
+          "path": "frontend/src/features/solitaire/components/WinDialog.tsx",
+          "operation": "modify",
+          "description": "Add English-labeled sections for: (1) 'Your Result' showing completion time and moves for this win, and (2) the two leaderboards in the same dialog content area; keep the existing 'Play Again' button wired to onNewGame. Use existing shadcn-ui primitives already imported (Dialog, Button) and optionally additional shadcn-ui read-only components by composing them only; verify the component's usage instructions before implementing."
         }
       ]
     }

@@ -3,6 +3,10 @@ import { useSolitaireGame } from './useSolitaireGame';
 import PileView from './components/PileView';
 import GameControls from './components/GameControls';
 import WinDialog from './components/WinDialog';
+import GameTimer from './components/GameTimer';
+import GameMoves from './components/GameMoves';
+import { useGameTimer } from './hooks/useGameTimer';
+import { usePlaythroughResults } from './results/usePlaythroughResults';
 import { Selection, DragPayload } from './solitaireTypes';
 import { SiX, SiFacebook, SiInstagram } from 'react-icons/si';
 import { setDragData, getDragData, dragPayloadToSelection } from './solitaireDrag';
@@ -10,6 +14,7 @@ import { setDragData, getDragData, dragPayloadToSelection } from './solitaireDra
 export default function SolitairePage() {
   const {
     gameState,
+    moves,
     selection,
     hint,
     isWon,
@@ -25,8 +30,16 @@ export default function SolitairePage() {
   } = useSolitaireGame();
   
   const [dragOverTarget, setDragOverTarget] = useState<{ type: string; index?: number } | null>(null);
+  const [gameInstanceKey, setGameInstanceKey] = useState(0);
   const dragSessionActive = useRef(false);
   const dropHandled = useRef(false);
+  const winRecorded = useRef<number | null>(null);
+  
+  // Timer hook - stops when game is won
+  const { formattedTime, elapsedSeconds } = useGameTimer(gameInstanceKey, !isWon);
+  
+  // Results tracking
+  const { addResult, bestTimes, bestMoves, formatTime } = usePlaythroughResults();
   
   useEffect(() => {
     if (hint) {
@@ -34,6 +47,19 @@ export default function SolitairePage() {
       return () => clearTimeout(timer);
     }
   }, [hint, clearHint]);
+  
+  // Record result when game is won (only once per game instance)
+  useEffect(() => {
+    if (isWon && winRecorded.current !== gameInstanceKey) {
+      winRecorded.current = gameInstanceKey;
+      addResult({ elapsedSeconds, moves });
+    }
+  }, [isWon, gameInstanceKey, elapsedSeconds, moves, addResult]);
+  
+  const handleNewGame = () => {
+    newGame();
+    setGameInstanceKey((prev) => prev + 1);
+  };
   
   const handlePileClick = (type: Selection['type'], index?: number, cardIndex?: number) => {
     const newSelection: Selection = { type, index, cardIndex };
@@ -44,7 +70,8 @@ export default function SolitairePage() {
     
     if (selection) {
       // Try to move - foundations can be targets but not sources
-      move(selection, newSelection);
+      // Click-based moves do NOT increment the move counter (isDragMove = false)
+      move(selection, newSelection, false);
     } else {
       // Select - do NOT allow selecting from foundation piles
       if (type === 'waste' && gameState.waste.length > 0) {
@@ -118,7 +145,8 @@ export default function SolitairePage() {
     
     // Attempt the move - if it fails, the game state won't change
     // and the cards will remain in their original location
-    move(from, to);
+    // Drag-and-drop moves DO increment the move counter (isDragMove = true)
+    move(from, to, true);
   };
   
   // Handle drops outside valid drop zones (background, header, footer, etc.)
@@ -162,23 +190,35 @@ export default function SolitairePage() {
     >
       {/* Header */}
       <header className="border-b border-border/40 bg-card/30 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-4 py-4 relative">
           <h1 className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 bg-clip-text text-transparent">
             Klondike Solitaire
           </h1>
+          {/* Timer and Moves in upper right corner (desktop) */}
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-4">
+            <GameTimer formattedTime={formattedTime} />
+            <GameMoves moves={moves} />
+          </div>
         </div>
       </header>
       
       {/* Main Game Area */}
       <main className="flex-1 container mx-auto px-4 py-6 sm:py-8">
         <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
-          {/* Controls */}
-          <GameControls
-            onNewGame={newGame}
-            onUndo={undo}
-            onHint={showHint}
-            canUndo={canUndo}
-          />
+          {/* Controls and Timer/Moves (mobile) */}
+          <div className="space-y-3">
+            <GameControls
+              onNewGame={handleNewGame}
+              onUndo={undo}
+              onHint={showHint}
+              canUndo={canUndo}
+            />
+            {/* Timer and Moves for mobile - centered below controls */}
+            <div className="flex justify-center gap-4 sm:hidden">
+              <GameTimer formattedTime={formattedTime} />
+              <GameMoves moves={moves} />
+            </div>
+          </div>
           
           {/* Top Row: Stock, Waste, and Foundations */}
           <div className="flex flex-wrap gap-3 sm:gap-4 justify-center sm:justify-between items-start">
@@ -257,14 +297,15 @@ export default function SolitairePage() {
                     : undefined
                 }
                 hintedIndex={
-                  isHinted('tableau', pileIndex, -1)
-                    ? -1
-                    : hint?.from.type === 'tableau' && hint.from.index === pileIndex
+                  hint?.from.type === 'tableau' && hint.from.index === pileIndex
                     ? hint.from.cardIndex
+                    : isHinted('tableau', pileIndex, -1)
+                    ? -1
                     : undefined
                 }
                 isTableau={true}
                 isEmpty={true}
+                emptyLabel=""
                 isDropTarget={true}
                 onDragOver={handleDragOver('tableau', pileIndex)}
                 onDragLeave={handleDragLeave}
@@ -282,33 +323,16 @@ export default function SolitairePage() {
       </main>
       
       {/* Footer */}
-      <footer className="border-t border-border/40 bg-card/30 backdrop-blur-sm mt-auto">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span>© {new Date().getFullYear()}</span>
-              <span>•</span>
-              <span>
-                Built with ❤️ using{' '}
-                <a
-                  href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(
-                    typeof window !== 'undefined' ? window.location.hostname : 'solitaire-app'
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-amber-400 hover:text-amber-300 transition-colors"
-                >
-                  caffeine.ai
-                </a>
-              </span>
-            </div>
+      <footer className="border-t border-border/40 bg-card/30 backdrop-blur-sm py-6">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <a
-                href="https://twitter.com"
+                href="https://x.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-amber-400 transition-colors"
-                aria-label="Twitter"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="X (Twitter)"
               >
                 <SiX className="w-5 h-5" />
               </a>
@@ -316,7 +340,7 @@ export default function SolitairePage() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-amber-400 transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Facebook"
               >
                 <SiFacebook className="w-5 h-5" />
@@ -325,18 +349,38 @@ export default function SolitairePage() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-amber-400 transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Instagram"
               >
                 <SiInstagram className="w-5 h-5" />
               </a>
             </div>
+            
+            <p className="text-sm text-muted-foreground text-center">
+              © {new Date().getFullYear()} Built with ❤️ using{' '}
+              <a
+                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400 hover:text-amber-300 transition-colors"
+              >
+                caffeine.ai
+              </a>
+            </p>
           </div>
         </div>
       </footer>
       
       {/* Win Dialog */}
-      <WinDialog open={isWon} onNewGame={newGame} />
+      <WinDialog 
+        open={isWon} 
+        onNewGame={handleNewGame}
+        currentTime={elapsedSeconds}
+        currentMoves={moves}
+        bestTimes={bestTimes}
+        bestMoves={bestMoves}
+        formatTime={formatTime}
+      />
     </div>
   );
 }

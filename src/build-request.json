@@ -1,54 +1,91 @@
 {
   "kind": "build_request",
-  "title": "Lock foundation piles (upper four slots) to prevent any interaction/move-out",
+  "title": "Store per-playthrough results and display separate best-time and best-moves leaderboards",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-17",
-      "text": "Make all cards in the four foundation piles (upper slots) permanently non-interactive (“locked”): players must not be able to select, click, or drag cards from foundations after they are placed there, while still allowing valid drops onto foundations from the waste/tableau.",
+      "id": "REQ-25",
+      "text": "Record a completed-playthrough result when (and only when) the user wins a game, capturing both (a) elapsed time in seconds from the game timer and (b) the current drag-move counter value for that playthrough.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Still having the disappearing issue. Let's try: Once a card is stacked in the upper four slots they are incapable of interaction and will remain \"locked\"."
+          "Let's track the time and number of moves separately storing them into two different categories. Lower time ranks higher, fewer moves ranks higher. Note the values of each for each playthrough and compile the results into a list for each stored category."
         ]
       },
       "acceptanceCriteria": [
-        "Clicking a foundation pile that contains cards does not create a selection and does not attempt any move from foundation.",
-        "Dragging from a foundation pile is not possible (no drag cursor/affordance; no drag payload created).",
-        "Dropping a valid card from waste/tableau onto a foundation still works exactly as before.",
-        "Undo still works for moves into foundations (undo can remove cards from foundations), but users still cannot directly move cards out of foundations via interaction.",
-        "Hint does not suggest any move whose source is a foundation pile (no hints that require interacting with foundations as a source)."
+        "When the win condition is reached, exactly one result entry is created for that playthrough (no duplicate entries due to re-renders).",
+        "Each recorded entry contains both elapsedSeconds and moves for that same playthrough.",
+        "Starting a New Game resets the in-progress timer and move counter as it does today, but does not delete previously recorded results."
       ]
     },
     {
-      "id": "REQ-18",
-      "text": "Add a small visual “locked” affordance/state to foundation top cards to make it clear they cannot be interacted with (without changing the overall dark theme), and ensure hover/active styling does not imply interactivity for foundation cards.",
+      "id": "REQ-26",
+      "text": "Persist the history of recorded playthrough results on the client so the results remain available across page reloads (e.g., using localStorage), and load the persisted results on app start.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Once a card is stacked in the upper four slots they are incapable of interaction and will remain \"locked\"."
+          "...storing them into two different categories."
         ]
       },
       "acceptanceCriteria": [
-        "Foundation cards do not show hover scale/active press effects that imply click/drag interaction.",
-        "A subtle locked visual state is visible on foundation top cards (e.g., reduced hover effects + small lock indicator/overlay), and it does not affect tableau/waste card styling.",
-        "Waste and tableau interactivity (click, drag, hover styling) remains unchanged."
+        "After winning at least one game, reloading the page keeps the previously recorded results available to the UI.",
+        "Persisted data is resilient to an empty/missing storage value (no crashes; defaults to empty lists)."
+      ]
+    },
+    {
+      "id": "REQ-27",
+      "text": "Compile and display two separate ranked lists derived from the recorded playthrough results: (1) Best Times ranked by lower completion time first, and (2) Best Moves ranked by fewer moves first. Each list entry must show both the primary metric and the other metric for that same playthrough (e.g., a time-ranked entry also shows its moves).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Lower time ranks higher, fewer moves ranks higher. Note the values of each for each playthrough and compile the results into a list for each stored category."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Best Times list is sorted ascending by elapsed time (lower ranks higher).",
+        "The Best Moves list is sorted ascending by moves (fewer ranks higher).",
+        "Each displayed row clearly shows the playthrough’s time (HH:MM:SS) and moves value.",
+        "If there are no recorded results yet, the UI shows an English empty-state message for each list (e.g., \"No completed games yet.\")."
+      ]
+    },
+    {
+      "id": "REQ-28",
+      "text": "Update the win UI so that, when the win dialog is shown, it includes the current playthrough’s completion time and moves, plus the two ranked lists (Best Times and Best Moves) in the same dialog or immediately adjacent UI section, using English labels.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Note the values of each for each playthrough and compile the results into a list for each stored category."
+        ]
+      },
+      "acceptanceCriteria": [
+        "On win, the dialog shows the player’s completion time and moves for that win.",
+        "On win, the dialog shows both ranked lists (Best Times and Best Moves) populated from stored results.",
+        "All user-facing text added for this feature is in English.",
+        "The existing 'Play Again' action continues to start a new game as it does today."
       ]
     }
   ],
   "constraints": [
-    "Do not edit any files under frontend/src/components/ui or any frontend immutablePaths listed in SYSTEM_CONTEXT.",
-    "Keep backend as a single Motoko actor; no backend changes are required for this request."
+    "Frontend files under frontend/src/components/ui must be treated as read-only and only composed, not edited.",
+    "Do not edit any paths listed in frontend.immutablePaths.",
+    "Keep all changes compatible with the existing timer hook (frontend/src/features/solitaire/hooks/useGameTimer.ts) and move counter logic (frontend/src/features/solitaire/solitaireHistory.ts)."
   ],
   "nonGoals": [
-    "Do not implement alternative fixes for the disappearing foundation drag bug that still allow moving cards out of foundations; foundations must remain locked per request.",
-    "Do not add new game modes, scoring, timers, or additional solitaire rule variants."
+    "Do not add third-party authentication providers; Internet Identity remains the only supported auth option.",
+    "Do not implement real-time/multiplayer leaderboards or server-side/global rankings.",
+    "Do not change the existing Klondike rules, drag-and-drop rules, or the definition of what counts as a move (drag-and-drop successful moves only)."
   ],
   "imageRequirements": {
     "required": [],

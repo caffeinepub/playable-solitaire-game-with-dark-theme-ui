@@ -1,17 +1,21 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 17,
+  "projectStateVersion": 25,
   "summary": "Build a simple playable solitaire game deployed to the user's personal canister, including a dark theme UI.",
   "architectural_notes": [
     "Drag-and-drop should validate drop targets; if drop is not on a valid stack location, the dragged card/run must revert to its pre-drag position/state.",
     "Foundation (upper four slots) stacked/overlapped rendering must preserve correct z-index/positioning and draggable top-card visibility when moving cards; moving a stacked foundation card should not unmount or visually hide it.",
-    "Consider a rules/UI mode where once a card is placed into a foundation slot it becomes locked (non-draggable/non-interactive) to prevent move-outs and avoid the foundation disappearing-card issue."
+    "Consider a rules/UI mode where once a card is placed into a foundation slot it becomes locked (non-draggable/non-interactive) to prevent move-outs and avoid the foundation disappearing-card issue.",
+    "Dragging a tableau stack/run (or a card with cards underneath) and dropping onto a valid stack location must correctly transfer the run; no cards should disappear. Ensure drag/drop move logic and rendering preserve card identity and pile membership for multi-card moves.",
+    "Define a \"move\" as a successful drag-and-drop that results in a valid state change; do not count simple clicks/taps or stock-to-waste draws / deck cycling as moves.",
+    "Add per-playthrough stats persistence: record completion time and move count at game end and store in two separate ranked lists (time asc, moves asc), likely persisted in canister storage across sessions."
   ],
   "known_issues": [
     "Bug: Dragging some cards/runs and releasing them outside a valid drop target can leave them not stacked and not reverted to their original location.",
-    "Bug: Moving a card from the upper four foundation slots after cards are visually stacked/overlapped can cause the dragged/moved card to disappear entirely."
+    "Bug: Moving a card from the upper four foundation slots after cards are visually stacked/overlapped can cause the dragged/moved card to disappear entirely.",
+    "Bug: Dragging a stack/run (or a card with subsequent cards underneath) onto an otherwise valid stackable tableau location can cause the dragged card(s) to disappear instead of being placed."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-a-single-page-klondike-solitaire-game-ui-that-is-immediately-playable-in-the-browser-including-tableau-foundation-stock-waste-and-a-visible-card-back-front-design",
@@ -156,6 +160,78 @@
         "REQ-18"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-fix-the-drag-and-drop-behavior-so-that-dragging-a-tableau-run-a-face-up-card-with-subsequent-cards-underneath-it-can-be-dropped-onto-a-valid-tableau-stack-and-the-moving-run-is-correctly-placed-without-any-cards-disappearing",
+      "title": "Fix the drag-and-drop behavior so that dragging a tableau run (a face-up card with subsequent cards underneath it) can be dropped onto a valid tableau stack, and the moving run is correctly placed without any cards disappearing.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-small-game-timer-ui-element-positioned-in-the-upper-right-corner-of-the-game-page-that-displays-elapsed-time-in-hours-minutes-and-full-seconds-only-formatted-as-hh-mm-ss-the-timer-must-start-at-00-00-00-when-a-new-game-begins-and-update-once-per-second",
+      "title": "Add a small game timer UI element positioned in the upper-right corner of the game page that displays elapsed time in hours, minutes, and full seconds only (formatted as HH:MM:SS). The timer must start at 00:00:00 when a new game begins and update once per second.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-move-counter-to-the-solitaire-game-state-that-increments-only-when-a-drag-and-drop-action-results-in-a-valid-successful-move-i-e-the-dropped-card-s-are-actually-placed-onto-a-tableau-or-foundation-pile-and-the-game-state-changes-the-move-counter-must-not-increment-for-click-based-moves-selections-and-must-not-increment-for-stock-to-waste-draws-or-stock-resets-shuffles",
+      "title": "Add a move counter to the Solitaire game state that increments only when a drag-and-drop action results in a valid, successful move (i.e., the dropped card(s) are actually placed onto a tableau or foundation pile and the game state changes). The move counter must not increment for click-based moves/selections, and must not increment for stock-to-waste draws or stock resets/shuffles.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-the-current-move-counter-in-the-ui-as-english-text-e-g-moves-0-in-a-location-consistent-with-the-existing-timer-ui-visible-on-desktop-near-the-upper-right-header-area-and-visible-on-mobile-in-the-controls-timer-area",
+      "title": "Display the current move counter in the UI as English text (e.g., \"Moves: 0\") in a location consistent with the existing timer UI: visible on desktop near the upper-right header area and visible on mobile in the controls/timer area.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-move-counter-behaves-sensibly-with-undo-and-new-game-new-game-resets-the-counter-to-0-and-undo-restores-the-prior-move-counter-value-for-the-undone-action-i-e-undoing-a-counted-drag-and-drop-move-decreases-restores-the-counter-accordingly-while-undoing-a-draw-does-not-affect-the-move-counter",
+      "title": "Ensure the move counter behaves sensibly with Undo and New Game: New Game resets the counter to 0, and Undo restores the prior move counter value for the undone action (i.e., undoing a counted drag-and-drop move decreases/restores the counter accordingly, while undoing a draw does not affect the move counter).",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-record-a-completed-playthrough-result-when-and-only-when-the-user-wins-a-game-capturing-both-a-elapsed-time-in-seconds-from-the-game-timer-and-b-the-current-drag-move-counter-value-for-that-playthrough",
+      "title": "Record a completed-playthrough result when (and only when) the user wins a game, capturing both (a) elapsed time in seconds from the game timer and (b) the current drag-move counter value for that playthrough.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-persist-the-history-of-recorded-playthrough-results-on-the-client-so-the-results-remain-available-across-page-reloads-e-g-using-localstorage-and-load-the-persisted-results-on-app-start",
+      "title": "Persist the history of recorded playthrough results on the client so the results remain available across page reloads (e.g., using localStorage), and load the persisted results on app start.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-compile-and-display-two-separate-ranked-lists-derived-from-the-recorded-playthrough-results-1-best-times-ranked-by-lower-completion-time-first-and-2-best-moves-ranked-by-fewer-moves-first-each-list-entry-must-show-both-the-primary-metric-and-the-other-metric-for-that-same-playthrough-e-g-a-time-ranked-entry-also-shows-its-moves",
+      "title": "Compile and display two separate ranked lists derived from the recorded playthrough results: (1) Best Times ranked by lower completion time first, and (2) Best Moves ranked by fewer moves first. Each list entry must show both the primary metric and the other metric for that same playthrough (e.g., a time-ranked entry also shows its moves).",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-win-ui-so-that-when-the-win-dialog-is-shown-it-includes-the-current-playthrough-s-completion-time-and-moves-plus-the-two-ranked-lists-best-times-and-best-moves-in-the-same-dialog-or-immediately-adjacent-ui-section-using-english-labels",
+      "title": "Update the win UI so that, when the win dialog is shown, it includes the current playthrough’s completion time and moves, plus the two ranked lists (Best Times and Best Moves) in the same dialog or immediately adjacent UI section, using English labels.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -204,6 +280,32 @@
     {
       "id": "AR-8",
       "summary": "Make foundation (upper four slots) cards non-interactive once stacked there (locked), to avoid interaction/move-outs that can trigger disappearing behavior",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Ensure drag cancellation and invalid drops never strand or hide cards when dragging tableau runs: if a tableau run is dropped outside a drop zone or onto a tableau drop zone where the move is invalid, the UI and game state must fully revert to the pre-drag state with no missing cards.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Add a small game timer in the upper-right corner showing hours, minutes, and full seconds",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Add a move counter that increments only on successful drag-and-drop moves (exclude clicks and stock/deck shuffles) and display it in the UI",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Track and store per-playthrough results in two separate ranked categories: best (lowest) completion time and best (fewest) moves, and maintain/display a compiled list for each category",
       "reqIds": [],
       "status": "pending"
     }

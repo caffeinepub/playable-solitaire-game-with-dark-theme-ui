@@ -2,13 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-make-all-cards-in-the-four-foundation-piles-upper-slots-permanently-non-interactive-locked-players-must-not-be-able-to-select-click-or-drag-cards-from-foundations-after-they-are-placed-there-while-still-allowing-valid-drops-onto-foundations-from-the-waste-tableau",
-      "featureTitle": "Make all cards in the four foundation piles (upper slots) permanently non-interactive (“locked”): players must not be able to select, click, or drag cards from foundations after they are placed there, while still allowing valid drops onto foundations from the waste/tableau.",
+      "featureId": "feature-record-a-completed-playthrough-result-when-and-only-when-the-user-wins-a-game-capturing-both-a-elapsed-time-in-seconds-from-the-game-timer-and-b-the-current-drag-move-counter-value-for-that-playthrough",
+      "featureTitle": "Record a completed-playthrough result when (and only when) the user wins a game, capturing both (a) elapsed time in seconds from the game timer and (b) the current drag-move counter value for that playthrough.",
       "files": [
         "frontend/src/features/solitaire/SolitairePage.tsx",
-        "frontend/src/features/solitaire/components/PileView.tsx",
-        "frontend/src/features/solitaire/solitaireDrag.ts",
-        "frontend/src/features/solitaire/solitaireHint.ts"
+        "frontend/src/features/solitaire/results/usePlaythroughResults.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -18,16 +16,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-17"
+        "REQ-25"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-small-visual-locked-affordance-state-to-foundation-top-cards-to-make-it-clear-they-cannot-be-interacted-with-without-changing-the-overall-dark-theme-and-ensure-hover-active-styling-does-not-imply-interactivity-for-foundation-cards",
-      "featureTitle": "Add a small visual “locked” affordance/state to foundation top cards to make it clear they cannot be interacted with (without changing the overall dark theme), and ensure hover/active styling does not imply interactivity for foundation cards.",
+      "featureId": "feature-persist-the-history-of-recorded-playthrough-results-on-the-client-so-the-results-remain-available-across-page-reloads-e-g-using-localstorage-and-load-the-persisted-results-on-app-start",
+      "featureTitle": "Persist the history of recorded playthrough results on the client so the results remain available across page reloads (e.g., using localStorage), and load the persisted results on app start.",
       "files": [
-        "frontend/src/features/solitaire/components/CardView.tsx",
-        "frontend/src/features/solitaire/components/PileView.tsx"
+        "frontend/src/features/solitaire/results/usePlaythroughResults.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -37,7 +34,45 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-18"
+        "REQ-26"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-compile-and-display-two-separate-ranked-lists-derived-from-the-recorded-playthrough-results-1-best-times-ranked-by-lower-completion-time-first-and-2-best-moves-ranked-by-fewer-moves-first-each-list-entry-must-show-both-the-primary-metric-and-the-other-metric-for-that-same-playthrough-e-g-a-time-ranked-entry-also-shows-its-moves",
+      "featureTitle": "Compile and display two separate ranked lists derived from the recorded playthrough results: (1) Best Times ranked by lower completion time first, and (2) Best Moves ranked by fewer moves first. Each list entry must show both the primary metric and the other metric for that same playthrough (e.g., a time-ranked entry also shows its moves).",
+      "files": [
+        "frontend/src/features/solitaire/components/WinDialog.tsx",
+        "frontend/src/features/solitaire/results/usePlaythroughResults.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-27"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-win-ui-so-that-when-the-win-dialog-is-shown-it-includes-the-current-playthrough-s-completion-time-and-moves-plus-the-two-ranked-lists-best-times-and-best-moves-in-the-same-dialog-or-immediately-adjacent-ui-section-using-english-labels",
+      "featureTitle": "Update the win UI so that, when the win dialog is shown, it includes the current playthrough’s completion time and moves, plus the two ranked lists (Best Times and Best Moves) in the same dialog or immediately adjacent UI section, using English labels.",
+      "files": [
+        "frontend/src/features/solitaire/SolitairePage.tsx",
+        "frontend/src/features/solitaire/components/WinDialog.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-28"
       ],
       "confidence": "high"
     }

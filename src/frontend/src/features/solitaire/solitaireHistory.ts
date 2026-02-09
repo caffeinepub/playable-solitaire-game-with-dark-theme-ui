@@ -1,21 +1,25 @@
 import { GameState } from './solitaireTypes';
 
 export interface HistoryState {
-  past: GameState[];
+  past: Array<{ state: GameState; moves: number }>;
   present: GameState;
+  moves: number;
 }
 
 export function createHistory(initialState: GameState): HistoryState {
   return {
     past: [],
     present: initialState,
+    moves: 0,
   };
 }
 
-export function pushHistory(history: HistoryState, newState: GameState): HistoryState {
+export function pushHistory(history: HistoryState, newState: GameState, incrementMoves: boolean = false): HistoryState {
+  const newMoves = incrementMoves ? history.moves + 1 : history.moves;
   return {
-    past: [...history.past, history.present],
+    past: [...history.past, { state: history.present, moves: history.moves }],
     present: newState,
+    moves: newMoves,
   };
 }
 
@@ -23,11 +27,12 @@ export function popHistory(history: HistoryState): HistoryState {
   if (history.past.length === 0) return history;
   
   const previous = [...history.past];
-  const present = previous.pop()!;
+  const lastSnapshot = previous.pop()!;
   
   return {
     past: previous,
-    present,
+    present: lastSnapshot.state,
+    moves: lastSnapshot.moves,
   };
 }
 
