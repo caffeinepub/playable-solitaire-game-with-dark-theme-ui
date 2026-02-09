@@ -1,34 +1,24 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-09T22:34:10.723Z",
-  "summary": "The diff updates NewGamePreferencesDialog to be a controlled shadcn Dialog (open/onOpenChange), adds a top-right X close control via DialogClose, and resets option state from default props when the dialog opens. However, the diff summary does not provide clear evidence that dismissing via X/ESC/outside is wired in the parent in a way that guarantees no new game starts and no preferences persist on dismiss.",
+  "generatedAt": "2026-02-09T23:26:35.876Z",
+  "summary": "The BuildRequest requires a frontend fix ensuring empty tableau columns remain visible and act as valid drag-and-drop targets after the last card is moved out (e.g., to foundation). The provided diff evidence only shows modifications to SolitairePage.tsx (truncated) plus metadata/summaries; there is no concrete diff evidence of updated tableau empty-slot rendering and drop handling logic, which is typically in the pile rendering/drag-drop component.",
   "missing_requirements": [
     {
-      "id": "REQ-40",
-      "requirement": "Clicking the top-right X (and other standard dismiss actions like ESC/click-outside if supported) closes the dialog and does not start a new game, does not persist/update any preferences, and leaves the current game state unchanged.",
-      "reason": "The dialog UI includes a DialogClose X, but the provided SolitairePage.tsx snippet only shows confirm behavior (handleNewGameConfirm) that saves preferences and starts a new game. The diff summary is truncated before showing how onOpenChange is handled for dismissals, so there is no explicit evidence that dismissing the dialog cannot trigger startNewGame() or savePreferences().",
+      "id": "REQ-42",
+      "requirement": "After the last remaining card is moved out of a tableau column into a foundation pile, the empty tableau space must still render a visible drop zone and accept valid drag-and-drop moves (King/King-led run) while rejecting invalid drops (non-King) with normal drag-over highlighting.",
+      "reason": "The diff does not include any visible code changes showing (1) an always-rendered empty tableau drop zone, (2) drag-over highlighting on that empty zone, or (3) drop validation/handling for empty tableau columns. Only SolitairePage.tsx is modified (and truncated), and no pile-level drag/drop implementation changes are shown.",
       "evidence": [
-        "frontend/src/features/solitaire/components/NewGamePreferencesDialog.tsx",
-        "frontend/src/features/solitaire/SolitairePage.tsx"
-      ]
-    },
-    {
-      "id": "REQ-41",
-      "requirement": "Parent page supports controlled open/close via onOpenChange so dismissing the dialog (X/ESC/outside) closes it, and closing via dismiss does not call the confirm/start callback.",
-      "reason": "NewGamePreferencesDialog now accepts and forwards onOpenChange to Dialog, but the diff summary does not show the actual parent-side onOpenChange handler passed into NewGamePreferencesDialog. Without that snippet, it’s not verifiable that dismiss events only close the modal and never call the confirm/start flow.",
-      "evidence": [
-        "frontend/src/features/solitaire/components/NewGamePreferencesDialog.tsx",
-        "frontend/src/features/solitaire/SolitairePage.tsx"
+        "frontend/src/features/solitaire/SolitairePage.tsx (truncated shows no explicit empty-tableau drop-zone logic)",
+        "MODIFIED FILES list shows no changes to PileView.tsx (where tableau drop zones/handlers are described to live)"
       ]
     }
   ],
   "hallucinated_features": [],
-  "confidence": 0.58,
+  "confidence": 0.62,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/features/solitaire/SolitairePage.tsx",
-    "frontend/src/features/solitaire/components/NewGamePreferencesDialog.tsx",
     "project_state.json"
   ]
 }

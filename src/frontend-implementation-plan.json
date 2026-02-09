@@ -1,43 +1,27 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Dismissable New Game Preferences dialog (X/ESC/outside) without starting a game",
+  "title": "Restore empty tableau column drop zone after last-card move",
   "requirements": [
     {
-      "id": "REQ-40",
-      "summary": "Add a top-right X close control and allow standard dialog dismissal for New Game Preferences without confirming or persisting changes",
+      "id": "REQ-42",
+      "summary": "Ensure empty tableau columns remain visible and usable drag-and-drop targets after their last card is moved to a foundation, enforcing King-only placement per existing rules.",
       "acceptanceCriteria": [
-        "When the New Game Preferences dialog is open, an upper-right X close button is visible and clickable.",
-        "Clicking the X closes the dialog and does not start a new game.",
-        "Clicking the X closes the dialog and does not persist/update any preferences (timer enabled, move tracking enabled, ask again).",
-        "After closing via X, the game remains in its prior state (no reset/deal triggered)."
+        "Given a tableau column becomes empty after moving its last card to a foundation, the UI still shows an empty slot/drop zone in that tableau position (not a blank, non-interactive area).",
+        "Dragging a King (or a face-up run starting with a King) from the waste or another tableau pile onto the empty tableau column succeeds and updates the game state correctly.",
+        "Dragging a non-King card/run onto an empty tableau column is rejected (state does not change), consistent with existing rules.",
+        "The empty tableau drop zone provides the same drag-over highlighting behavior used for other drop targets (when applicable)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/solitaire/components/NewGamePreferencesDialog.tsx",
+          "path": "frontend/src/features/solitaire/components/PileView.tsx",
           "operation": "modify",
-          "description": "Update the New Game Preferences modal UI to include a top-right close control using shadcn-ui Dialog composition (e.g., DialogClose + X icon), and enable standard dismissal behavior (ESC / outside click) via the Dialog component. Ensure dismissal only closes the modal (no calls to onConfirm and no preference persistence). Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-41",
-      "summary": "Make New Game Preferences dialog controlled by parent open state, and reset option state from latest defaults on reopen",
-      "acceptanceCriteria": [
-        "The parent page can close the New Game Preferences dialog when the user dismisses it (e.g., via an onOpenChange callback).",
-        "Re-opening the New Game Preferences dialog shows option values initialized from the latest provided defaults (not stale values from a previous open).",
-        "Closing the dialog via X/dismiss does not call the confirm/start callback."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/features/solitaire/components/NewGamePreferencesDialog.tsx",
-          "operation": "modify",
-          "description": "Add an onOpenChange prop and wire it into the shadcn-ui Dialog so the parent can control open/close. Add an effect that re-initializes the dialog's local checkbox state from default* props whenever the dialog opens, matching the reset-on-open pattern used in the app's other preferences dialog. Verify the component's usage instructions before implementing."
+          "description": "Fix empty-pile rendering so a tableau pile with zero cards still renders a visible, interactive drop zone whenever it is a drop target (including drag-over highlighting and wiring dragOver/dragLeave/drop handlers), instead of returning a non-interactive blank container."
         },
         {
           "path": "frontend/src/features/solitaire/SolitairePage.tsx",
           "operation": "modify",
-          "description": "Wire NewGamePreferencesDialog as a controlled dialog by passing an onOpenChange handler that updates newGameDialogOpen. Ensure dismissing (X/ESC/outside) only closes the dialog and does not call the start/confirm flow or trigger a new game."
+          "description": "Adjust tableau pile rendering props so empty tableau columns explicitly render the empty-slot UI (e.g., pass isEmpty based on pile length and keep isDropTarget enabled), ensuring the drop zone remains visible immediately after moving the last card out."
         }
       ]
     }

@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-new-game-preferences-modal-dialog-so-it-can-be-dismissed-via-a-top-right-x-close-control-and-standard-dialog-dismissal-like-esc-clicking-outside-if-supported-by-the-dialog-component-without-requiring-the-user-to-select-any-options-or-click-start-game",
-      "featureTitle": "Update the \"New Game Preferences\" modal dialog so it can be dismissed via a top-right \"X\" close control (and standard dialog dismissal like ESC / clicking outside, if supported by the dialog component) without requiring the user to select any options or click \"Start Game\".",
+      "featureId": "feature-fix-the-bug-where-after-the-last-remaining-card-is-moved-out-of-a-tableau-column-e-g-the-first-tableau-pile-that-started-as-a-single-card-into-a-foundation-pile-the-now-empty-tableau-space-is-not-usable-as-a-drop-target-to-start-a-new-descending-stack-empty-tableau-columns-must-continue-to-render-a-visible-drop-zone-and-accept-valid-drag-and-drop-moves-e-g-dropping-a-king-or-king-led-run-according-to-existing-klondike-rules",
+      "featureTitle": "Fix the bug where, after the last remaining card is moved out of a tableau column (e.g., the first tableau pile that started as a single card) into a foundation pile, the now-empty tableau space is not usable as a drop target to start a new descending stack. Empty tableau columns must continue to render a visible drop zone and accept valid drag-and-drop moves (e.g., dropping a King or King-led run) according to existing Klondike rules.",
       "files": [
-        "frontend/src/features/solitaire/components/NewGamePreferencesDialog.tsx"
+        "frontend/src/features/solitaire/SolitairePage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -15,26 +15,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-40"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-wire-the-new-game-preferences-dialog-to-support-controlled-open-close-behavior-from-the-parent-page-so-the-dialog-can-close-when-the-user-clicks-the-top-right-x-and-ensure-the-dialog-s-option-state-resets-appropriately-on-reopen-based-on-the-current-default-preference-props",
-      "featureTitle": "Wire the New Game Preferences dialog to support controlled open/close behavior from the parent page (so the dialog can close when the user clicks the top-right X), and ensure the dialog's option state resets appropriately on reopen based on the current default preference props.",
-      "files": [
-        "frontend/src/features/solitaire/SolitairePage.tsx",
-        "frontend/src/features/solitaire/components/NewGamePreferencesDialog.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-41"
+        "REQ-42"
       ],
       "confidence": "high"
     }

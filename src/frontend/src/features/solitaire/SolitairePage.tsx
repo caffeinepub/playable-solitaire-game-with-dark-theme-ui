@@ -352,8 +352,9 @@ export default function SolitairePage() {
                     ? -1 
                     : undefined
                 }
-                isEmpty={false}
-                emptyLabel=""
+                isEmpty={true}
+                emptyLabel="K"
+                isTableau={true}
                 isDropTarget={true}
                 onDragOver={handleDragOver('tableau', pileIndex)}
                 onDragLeave={handleDragLeave}

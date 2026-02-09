@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 37,
+  "projectStateVersion": 39,
   "summary": "Build a simple playable solitaire game deployed to the user's personal canister, including a dark theme UI.",
   "architectural_notes": [
     "Drag-and-drop should validate drop targets; if drop is not on a valid stack location, the dragged card/run must revert to its pre-drag position/state.",
@@ -11,15 +11,17 @@
     "Add per-playthrough stats persistence: record completion time and move count at game end and store in two separate ranked lists (time asc, moves asc), likely persisted in canister storage across sessions.",
     "Waste pile rendering should display only the most recent (top) waste card in a single-stack position during normal play; avoid any multi-card 3-overlap/fan presentation on draw.",
     "Add a New Game preflight prompt to opt into Timer and/or Move Tracking independently; persist the user’s \"ask again\" preference and provide a reversible UI control to re-enable prompting after selecting \"No Thanks\".",
-    "Modal prompts (e.g., New Game Timer/Move Tracking prompt) must be user-dismissible via an upper-right “X” without requiring any option selection; dismissal should leave preferences unchanged."
+    "Modal prompts (e.g., New Game Timer/Move Tracking prompt) must be user-dismissible via an upper-right “X” without requiring any option selection; dismissal should leave preferences unchanged.",
+    "Empty tableau columns must remain valid drop targets after the last card is moved away (e.g., to foundation); the empty pile/placeholder should still accept valid tableau drops per Klondike rules (typically Kings / King-led runs)."
   ],
   "known_issues": [
     "Bug: Dragging some cards/runs and releasing them outside a valid drop target can leave them not stacked and not reverted to their original location.",
     "Bug: Moving a card from the upper four foundation slots after cards are visually stacked/overlapped can cause the dragged/moved card to disappear entirely.",
     "Bug: Dragging a stack/run (or a card with subsequent cards underneath) onto an otherwise valid stackable tableau location can cause the dragged card(s) to disappear instead of being placed.",
-    "UI issue: Stock-to-waste draws can render up to three overlapping waste cards; desired behavior is a single-stack display showing only the topmost waste card."
+    "UI issue: Stock-to-waste draws can render up to three overlapping waste cards; desired behavior is a single-stack display showing only the topmost waste card.",
+    "Bug: After moving the last remaining (single) card from a tableau column to a foundation pile, the now-empty tableau space becomes unusable as a drop target to start a new descending stack (empty tableau column not accepting valid moves)."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-a-single-page-klondike-solitaire-game-ui-that-is-immediately-playable-in-the-browser-including-tableau-foundation-stock-waste-and-a-visible-card-back-front-design",
@@ -338,6 +340,14 @@
       "title": "Wire the New Game Preferences dialog to support controlled open/close behavior from the parent page (so the dialog can close when the user clicks the top-right X), and ensure the dialog's option state resets appropriately on reopen based on the current default preference props.",
       "reqIds": [
         "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-bug-where-after-the-last-remaining-card-is-moved-out-of-a-tableau-column-e-g-the-first-tableau-pile-that-started-as-a-single-card-into-a-foundation-pile-the-now-empty-tableau-space-is-not-usable-as-a-drop-target-to-start-a-new-descending-stack-empty-tableau-columns-must-continue-to-render-a-visible-drop-zone-and-accept-valid-drag-and-drop-moves-e-g-dropping-a-king-or-king-led-run-according-to-existing-klondike-rules",
+      "title": "Fix the bug where, after the last remaining card is moved out of a tableau column (e.g., the first tableau pile that started as a single card) into a foundation pile, the now-empty tableau space is not usable as a drop target to start a new descending stack. Empty tableau columns must continue to render a visible drop zone and accept valid drag-and-drop moves (e.g., dropping a King or King-led run) according to existing Klondike rules.",
+      "reqIds": [
+        "REQ-42"
       ],
       "version": 1
     }

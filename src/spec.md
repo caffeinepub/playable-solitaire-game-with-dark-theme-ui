@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Let players dismiss the “New Game Preferences” modal via a top-right close (X) control (and standard dismissal, where supported) without selecting options or starting a new game.
+**Goal:** Ensure an empty tableau column remains a visible, interactive drag-and-drop drop target after its last card is moved to a foundation.
 
 **Planned changes:**
-- Add a visible, clickable top-right “X” close control to the New Game Preferences modal using composition (without modifying read-only UI component files).
-- Wire the dialog for controlled open/close from the parent (e.g., via an open state and onOpenChange handler) so dismiss actions can close the modal.
-- Ensure dismissing/closing the dialog (X/ESC/outside click, if supported) does not trigger “Start Game” and does not persist/update any preference values.
-- Reset/initialize the dialog’s option state on each reopen from the latest default preference props (avoid stale state from prior opens).
+- Update tableau rendering so that when a tableau column has no cards, it still displays an empty slot/drop zone in the correct position.
+- Ensure the empty tableau drop zone participates in drag-and-drop interactions (drag-over highlighting and drop handling) the same way other tableau targets do.
+- Enforce existing Klondike rules for empty tableau drops: accept a King (or King-led face-up run) and reject non-King drops without changing game state.
 
-**User-visible outcome:** When the New Game Preferences dialog is open, the user can close it using the top-right X (and other supported dismissal methods) without starting a new game or changing any saved preferences, leaving the current game state unchanged.
+**User-visible outcome:** After moving the last card out of a tableau column, the empty space still appears as a drop zone and correctly allows King (or King-led run) drops while rejecting invalid drops, with consistent drag-over highlighting.
