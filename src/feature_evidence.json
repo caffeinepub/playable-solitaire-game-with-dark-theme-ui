@@ -2,10 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-bug-where-after-the-last-remaining-card-is-moved-out-of-a-tableau-column-e-g-the-first-tableau-pile-that-started-as-a-single-card-into-a-foundation-pile-the-now-empty-tableau-space-is-not-usable-as-a-drop-target-to-start-a-new-descending-stack-empty-tableau-columns-must-continue-to-render-a-visible-drop-zone-and-accept-valid-drag-and-drop-moves-e-g-dropping-a-king-or-king-led-run-according-to-existing-klondike-rules",
-      "featureTitle": "Fix the bug where, after the last remaining card is moved out of a tableau column (e.g., the first tableau pile that started as a single card) into a foundation pile, the now-empty tableau space is not usable as a drop target to start a new descending stack. Empty tableau columns must continue to render a visible drop zone and accept valid drag-and-drop moves (e.g., dropping a King or King-led run) according to existing Klondike rules.",
+      "featureId": "feature-remove-the-foundation-suit-space-locked-behavior-so-foundation-piles-can-be-used-as-move-sources-again-via-click-to-select-and-drag-and-drop-while-still-enforcing-existing-klondike-move-rules",
+      "featureTitle": "Remove the foundation (suit space) \"locked\" behavior so foundation piles can be used as move sources again (via click-to-select and drag-and-drop), while still enforcing existing Klondike move rules.",
       "files": [
-        "frontend/src/features/solitaire/SolitairePage.tsx"
+        "frontend/src/features/solitaire/SolitairePage.tsx",
+        "frontend/src/features/solitaire/components/PileView.tsx",
+        "frontend/src/features/solitaire/solitaireDrag.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -15,7 +17,46 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-42"
+        "REQ-43"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-remove-the-visual-lock-affordance-and-disabled-styling-from-foundation-top-cards-so-foundation-cards-look-and-behave-like-normal-interactive-cards-when-they-are-draggable-selectable",
+      "featureTitle": "Remove the visual lock affordance and disabled styling from foundation top cards, so foundation cards look and behave like normal interactive cards when they are draggable/selectable.",
+      "files": [
+        "frontend/src/features/solitaire/SolitairePage.tsx",
+        "frontend/src/features/solitaire/components/CardView.tsx",
+        "frontend/src/features/solitaire/components/PileView.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-44"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-hint-behavior-to-include-legal-moves-from-foundation-piles-e-g-foundation-top-card-to-a-valid-tableau-pile-since-foundations-are-no-longer-locked",
+      "featureTitle": "Update the Hint behavior to include legal moves FROM foundation piles (e.g., foundation top card to a valid tableau pile), since foundations are no longer locked.",
+      "files": [
+        "frontend/src/features/solitaire/SolitairePage.tsx",
+        "frontend/src/features/solitaire/solitaireHint.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-45"
       ],
       "confidence": "high"
     }

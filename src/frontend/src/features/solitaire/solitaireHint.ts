@@ -1,79 +1,76 @@
 import { GameState, HintData, Selection } from './solitaireTypes';
-import { canPlaceOnFoundation, canPlaceOnTableau } from './solitaireLogic';
+import { canMoveToTableau, canMoveToFoundation } from './solitaireLogic';
 
 export function findHint(state: GameState): HintData | null {
-  // Check waste to foundation
+  // Priority 1: Waste to foundation
   if (state.waste.length > 0) {
-    const wasteCard = state.waste[state.waste.length - 1];
-    for (let i = 0; i < 4; i++) {
-      if (canPlaceOnFoundation(wasteCard, state.foundations[i])) {
-        return {
-          from: { type: 'waste' },
-          to: { type: 'foundation', index: i },
-        };
+    for (let foundationIndex = 0; foundationIndex < 4; foundationIndex++) {
+      const from: Selection = { type: 'waste' };
+      const to: Selection = { type: 'foundation', index: foundationIndex };
+      if (canMoveToFoundation(state, from, to)) {
+        return { from, to };
       }
     }
   }
-  
-  // Check waste to tableau
-  if (state.waste.length > 0) {
-    const wasteCard = state.waste[state.waste.length - 1];
-    for (let i = 0; i < 7; i++) {
-      if (canPlaceOnTableau(wasteCard, state.tableau[i])) {
-        return {
-          from: { type: 'waste' },
-          to: { type: 'tableau', index: i },
-        };
-      }
-    }
-  }
-  
-  // Check tableau to foundation
-  for (let i = 0; i < 7; i++) {
-    const pile = state.tableau[i];
+
+  // Priority 2: Tableau to foundation
+  for (let tableauIndex = 0; tableauIndex < 7; tableauIndex++) {
+    const pile = state.tableau[tableauIndex];
     if (pile.length > 0) {
-      const topCard = pile[pile.length - 1];
-      if (topCard.faceUp) {
-        for (let j = 0; j < 4; j++) {
-          if (canPlaceOnFoundation(topCard, state.foundations[j])) {
-            return {
-              from: { type: 'tableau', index: i, cardIndex: pile.length - 1 },
-              to: { type: 'foundation', index: j },
-            };
-          }
+      const topCardIndex = pile.length - 1;
+      for (let foundationIndex = 0; foundationIndex < 4; foundationIndex++) {
+        const from: Selection = { type: 'tableau', index: tableauIndex, cardIndex: topCardIndex };
+        const to: Selection = { type: 'foundation', index: foundationIndex };
+        if (canMoveToFoundation(state, from, to)) {
+          return { from, to };
         }
       }
     }
   }
-  
-  // Check tableau to tableau
-  for (let i = 0; i < 7; i++) {
-    const pile = state.tableau[i];
-    for (let cardIdx = 0; cardIdx < pile.length; cardIdx++) {
-      const card = pile[cardIdx];
-      if (card.faceUp) {
-        for (let j = 0; j < 7; j++) {
-          if (i !== j && canPlaceOnTableau(card, state.tableau[j])) {
-            return {
-              from: { type: 'tableau', index: i, cardIndex: cardIdx },
-              to: { type: 'tableau', index: j },
-            };
-          }
+
+  // Priority 3: Foundation to tableau
+  for (let foundationIndex = 0; foundationIndex < 4; foundationIndex++) {
+    const pile = state.foundations[foundationIndex];
+    if (pile.length > 0) {
+      const topCardIndex = pile.length - 1;
+      for (let tableauIndex = 0; tableauIndex < 7; tableauIndex++) {
+        const from: Selection = { type: 'foundation', index: foundationIndex, cardIndex: topCardIndex };
+        const to: Selection = { type: 'tableau', index: tableauIndex };
+        if (canMoveToTableau(state, from, to)) {
+          return { from, to };
         }
       }
     }
   }
-  
-  // NOTE: Foundation piles are locked - never suggest moves FROM foundations
-  // This ensures hints never use foundation as a source
-  
-  // Check if can draw from stock
-  if (state.stock.length > 0) {
-    return {
-      from: { type: 'waste' },
-      to: { type: 'waste' },
-    };
+
+  // Priority 4: Waste to tableau
+  if (state.waste.length > 0) {
+    for (let tableauIndex = 0; tableauIndex < 7; tableauIndex++) {
+      const from: Selection = { type: 'waste' };
+      const to: Selection = { type: 'tableau', index: tableauIndex };
+      if (canMoveToTableau(state, from, to)) {
+        return { from, to };
+      }
+    }
   }
-  
+
+  // Priority 5: Tableau to tableau
+  for (let fromTableauIndex = 0; fromTableauIndex < 7; fromTableauIndex++) {
+    const pile = state.tableau[fromTableauIndex];
+    for (let cardIndex = 0; cardIndex < pile.length; cardIndex++) {
+      if (!pile[cardIndex].faceUp) continue;
+      
+      for (let toTableauIndex = 0; toTableauIndex < 7; toTableauIndex++) {
+        if (fromTableauIndex === toTableauIndex) continue;
+        
+        const from: Selection = { type: 'tableau', index: fromTableauIndex, cardIndex };
+        const to: Selection = { type: 'tableau', index: toTableauIndex };
+        if (canMoveToTableau(state, from, to)) {
+          return { from, to };
+        }
+      }
+    }
+  }
+
   return null;
 }

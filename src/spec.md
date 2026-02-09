@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Ensure an empty tableau column remains a visible, interactive drag-and-drop drop target after its last card is moved to a foundation.
+**Goal:** Remove the foundation (suit space) “lock” behavior so foundation piles are fully interactive move sources again, while keeping all existing Klondike legality rules intact.
 
 **Planned changes:**
-- Update tableau rendering so that when a tableau column has no cards, it still displays an empty slot/drop zone in the correct position.
-- Ensure the empty tableau drop zone participates in drag-and-drop interactions (drag-over highlighting and drop handling) the same way other tableau targets do.
-- Enforce existing Klondike rules for empty tableau drops: accept a King (or King-led face-up run) and reject non-King drops without changing game state.
+- Enable selecting and dragging the top card from foundation piles as valid move sources, with normal move validation and no state change on illegal moves.
+- Remove lock-related drag payload blocking/serialization restrictions and ensure drops originating from foundations are handled like other sources.
+- Remove the lock icon overlay and any locked/disabled styling on foundation top cards, restoring normal hover/active/draggable visuals.
+- Update the Hint system to include legal moves from foundation top cards to tableau piles, without changing existing hint behavior for other move types.
 
-**User-visible outcome:** After moving the last card out of a tableau column, the empty space still appears as a drop zone and correctly allows King (or King-led run) drops while rejecting invalid drops, with consistent drag-over highlighting.
+**User-visible outcome:** Players can click or drag the top card from a foundation pile to attempt moves to tableau; legal moves work, illegal moves do nothing, foundations no longer look locked, and hints may suggest legal foundation-to-tableau moves.

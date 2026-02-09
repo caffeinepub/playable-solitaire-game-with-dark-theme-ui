@@ -1,48 +1,75 @@
 {
   "kind": "build_request",
-  "title": "Fix empty tableau column drop target after moving last card to foundation",
+  "title": "Remove foundation lock so suit spaces are fully interactive",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-42",
-      "text": "Fix the bug where, after the last remaining card is moved out of a tableau column (e.g., the first tableau pile that started as a single card) into a foundation pile, the now-empty tableau space is not usable as a drop target to start a new descending stack. Empty tableau columns must continue to render a visible drop zone and accept valid drag-and-drop moves (e.g., dropping a King or King-led run) according to existing Klondike rules.",
+      "id": "REQ-43",
+      "text": "Remove the foundation (suit space) \"locked\" behavior so foundation piles can be used as move sources again (via click-to-select and drag-and-drop), while still enforcing existing Klondike move rules.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "There appears to be an issue where if the first (single) card stack is itself stacked into an appropriate suit stack, the remaining space is unavailable to use to start a new descending stack"
+          "Let's remove the LOCK feature from the suit spaces"
         ]
       },
       "acceptanceCriteria": [
-        "Given a tableau column becomes empty after moving its last card to a foundation, the UI still shows an empty slot/drop zone in that tableau position (not a blank, non-interactive area).",
-        "Dragging a King (or a face-up run starting with a King) from the waste or another tableau pile onto the empty tableau column succeeds and updates the game state correctly.",
-        "Dragging a non-King card/run onto an empty tableau column is rejected (state does not change), consistent with existing rules.",
-        "The empty tableau drop zone provides the same drag-over highlighting behavior used for other drop targets (when applicable)."
+        "A player can click the top card in a foundation pile to select it, and then click a tableau pile to attempt a move; the move succeeds only when rules allow and otherwise leaves state unchanged.",
+        "A player can drag the top card from a foundation pile and drop it onto a tableau pile; the move succeeds only when rules allow and otherwise leaves state unchanged (no stranded/missing cards).",
+        "Dragging from foundations is no longer blocked in drag payload validation/serialization, and drops originating from foundations are handled normally.",
+        "Existing restrictions remain in place: only the top foundation card can move; no multi-card moves from foundations; all move legality is still enforced by the current Klondike rules."
+      ]
+    },
+    {
+      "id": "REQ-44",
+      "text": "Remove the visual lock affordance and disabled styling from foundation top cards, so foundation cards look and behave like normal interactive cards when they are draggable/selectable.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Let's remove the LOCK feature from the suit spaces"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The lock icon overlay is no longer rendered on foundation cards.",
+        "Foundation cards no longer show a locked/disabled cursor (e.g., no cursor-not-allowed) and do not appear visually \"locked\" (e.g., no forced opacity changes for lock state).",
+        "Foundation top cards regain normal hover/active styling consistent with other interactive cards (while still respecting any existing selection/hint styling)."
+      ]
+    },
+    {
+      "id": "REQ-45",
+      "text": "Update the Hint behavior to include legal moves FROM foundation piles (e.g., foundation top card to a valid tableau pile), since foundations are no longer locked.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Let's remove the LOCK feature from the suit spaces"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When at least one legal move exists from a foundation top card to a tableau pile, the Hint system can return and highlight such a move.",
+        "Hint behavior for waste-to-foundation, waste-to-tableau, tableau-to-foundation, and tableau-to-tableau remains functional and unchanged in intent."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/components/ui or any frontend immutablePaths listed in SYSTEM_CONTEXT.",
-    "Keep all backend Motoko logic unchanged; this is a frontend rendering/interaction bug."
+    "Do not edit any files under frontend/src/components/ui (read-only UI components must be composed, not modified).",
+    "Do not modify the immutable hook files listed in SYSTEM_CONTEXT (frontend/src/hooks/useInternetIdentity.ts/tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
+    "Keep backend as a single Motoko actor; no backend changes are required for this request."
   ],
   "nonGoals": [
-    "Changing Klondike move rules (e.g., allowing non-Kings onto empty tableau columns).",
-    "Adding new gameplay features unrelated to tableau empty-slot drop behavior."
+    "Do not change Klondike legality rules (only remove the foundation lock restriction).",
+    "Do not add new scoring, timer, or leaderboard features.",
+    "Do not redesign the overall visual theme beyond removing lock-specific visuals on foundation cards."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

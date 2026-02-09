@@ -1,11 +1,10 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 39,
+  "projectStateVersion": 41,
   "summary": "Build a simple playable solitaire game deployed to the user's personal canister, including a dark theme UI.",
   "architectural_notes": [
     "Drag-and-drop should validate drop targets; if drop is not on a valid stack location, the dragged card/run must revert to its pre-drag position/state.",
     "Foundation (upper four slots) stacked/overlapped rendering must preserve correct z-index/positioning and draggable top-card visibility when moving cards; moving a stacked foundation card should not unmount or visually hide it.",
-    "Consider a rules/UI mode where once a card is placed into a foundation slot it becomes locked (non-draggable/non-interactive) to prevent move-outs and avoid the foundation disappearing-card issue.",
     "Dragging a tableau stack/run (or a card with cards underneath) and dropping onto a valid stack location must correctly transfer the run; no cards should disappear. Ensure drag/drop move logic and rendering preserve card identity and pile membership for multi-card moves.",
     "Define a \"move\" as a successful drag-and-drop that results in a valid state change; do not count simple clicks/taps or stock-to-waste draws / deck cycling as moves.",
     "Add per-playthrough stats persistence: record completion time and move count at game end and store in two separate ranked lists (time asc, moves asc), likely persisted in canister storage across sessions.",
@@ -350,6 +349,30 @@
         "REQ-42"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-remove-the-foundation-suit-space-locked-behavior-so-foundation-piles-can-be-used-as-move-sources-again-via-click-to-select-and-drag-and-drop-while-still-enforcing-existing-klondike-move-rules",
+      "title": "Remove the foundation (suit space) \"locked\" behavior so foundation piles can be used as move sources again (via click-to-select and drag-and-drop), while still enforcing existing Klondike move rules.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-visual-lock-affordance-and-disabled-styling-from-foundation-top-cards-so-foundation-cards-look-and-behave-like-normal-interactive-cards-when-they-are-draggable-selectable",
+      "title": "Remove the visual lock affordance and disabled styling from foundation top cards, so foundation cards look and behave like normal interactive cards when they are draggable/selectable.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-hint-behavior-to-include-legal-moves-from-foundation-piles-e-g-foundation-top-card-to-a-valid-tableau-pile-since-foundations-are-no-longer-locked",
+      "title": "Update the Hint behavior to include legal moves FROM foundation piles (e.g., foundation top card to a valid tableau pile), since foundations are no longer locked.",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -392,12 +415,6 @@
     {
       "id": "AR-7",
       "summary": "Change foundation pile visual stacking so newly placed ascending suit cards cover/overlap the previous lower card (instead of showing a fanned stack)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Make foundation (upper four slots) cards non-interactive once stacked there (locked), to avoid interaction/move-outs that can trigger disappearing behavior",
       "reqIds": [],
       "status": "pending"
     },

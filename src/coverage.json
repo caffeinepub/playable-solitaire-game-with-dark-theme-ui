@@ -1,24 +1,55 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-09T23:26:35.879Z",
+  "generatedAt": "2026-02-09T23:35:29.430Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-42",
-        "summary": "Fix the bug where, after the last remaining card is moved out of a tableau column (e.g., the first tableau pile that started as a single card) into a foundation pile, the now-empty tableau space is not usable as a drop target to start a new descending stack. Empty tableau columns must continue to render a visible drop zone and accept valid drag-and-drop moves (e.g., dropping a King or King-led run) according to existing Klondike rules.",
+        "id": "REQ-43",
+        "summary": "Remove the foundation (suit space) \"locked\" behavior so foundation piles can be used as move sources again (via click-to-select and drag-and-drop), while still enforcing existing Klondike move rules.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/features/solitaire/solitaireDrag.ts",
+          "frontend/src/features/solitaire/SolitairePage.tsx",
+          "frontend/src/features/solitaire/components/PileView.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/features/solitaire/solitaireDrag.ts",
+          "frontend/src/features/solitaire/SolitairePage.tsx",
+          "frontend/src/features/solitaire/components/PileView.tsx"
+        ]
+      },
+      {
+        "id": "REQ-44",
+        "summary": "Remove the visual lock affordance and disabled styling from foundation top cards, so foundation cards look and behave like normal interactive cards when they are draggable/selectable.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/features/solitaire/components/CardView.tsx",
           "frontend/src/features/solitaire/components/PileView.tsx",
           "frontend/src/features/solitaire/SolitairePage.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/features/solitaire/components/CardView.tsx",
+          "frontend/src/features/solitaire/components/PileView.tsx",
+          "frontend/src/features/solitaire/SolitairePage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-45",
+        "summary": "Update the Hint behavior to include legal moves FROM foundation piles (e.g., foundation top card to a valid tableau pile), since foundations are no longer locked.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/features/solitaire/solitaireHint.ts",
+          "frontend/src/features/solitaire/SolitairePage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/features/solitaire/solitaireHint.ts",
           "frontend/src/features/solitaire/SolitairePage.tsx"
         ]
       }
@@ -30,6 +61,10 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/features/solitaire/SolitairePage.tsx",
+    "frontend/src/features/solitaire/components/CardView.tsx",
+    "frontend/src/features/solitaire/components/PileView.tsx",
+    "frontend/src/features/solitaire/solitaireDrag.ts",
+    "frontend/src/features/solitaire/solitaireHint.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

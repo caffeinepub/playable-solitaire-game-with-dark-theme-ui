@@ -1,24 +1,18 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-09T23:26:35.876Z",
-  "summary": "The BuildRequest requires a frontend fix ensuring empty tableau columns remain visible and act as valid drag-and-drop targets after the last card is moved out (e.g., to foundation). The provided diff evidence only shows modifications to SolitairePage.tsx (truncated) plus metadata/summaries; there is no concrete diff evidence of updated tableau empty-slot rendering and drop handling logic, which is typically in the pile rendering/drag-drop component.",
-  "missing_requirements": [
-    {
-      "id": "REQ-42",
-      "requirement": "After the last remaining card is moved out of a tableau column into a foundation pile, the empty tableau space must still render a visible drop zone and accept valid drag-and-drop moves (King/King-led run) while rejecting invalid drops (non-King) with normal drag-over highlighting.",
-      "reason": "The diff does not include any visible code changes showing (1) an always-rendered empty tableau drop zone, (2) drag-over highlighting on that empty zone, or (3) drop validation/handling for empty tableau columns. Only SolitairePage.tsx is modified (and truncated), and no pile-level drag/drop implementation changes are shown.",
-      "evidence": [
-        "frontend/src/features/solitaire/SolitairePage.tsx (truncated shows no explicit empty-tableau drop-zone logic)",
-        "MODIFIED FILES list shows no changes to PileView.tsx (where tableau drop zones/handlers are described to live)"
-      ]
-    }
-  ],
+  "generatedAt": "2026-02-09T23:35:29.427Z",
+  "summary": "Diff implements the requested removal of foundation-lock behavior by (1) allowing drag payloads from foundations, (2) rendering foundation top cards with normal interactive CardView behavior (click/drag handlers) and removing lock/disabled styling, and (3) updating the Hint system to include foundation-to-tableau legal moves.",
+  "missing_requirements": [],
   "hallucinated_features": [],
-  "confidence": 0.62,
+  "confidence": 0.74,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/features/solitaire/SolitairePage.tsx",
+    "frontend/src/features/solitaire/components/CardView.tsx",
+    "frontend/src/features/solitaire/components/PileView.tsx",
+    "frontend/src/features/solitaire/solitaireDrag.ts",
+    "frontend/src/features/solitaire/solitaireHint.ts",
     "project_state.json"
   ]
 }
