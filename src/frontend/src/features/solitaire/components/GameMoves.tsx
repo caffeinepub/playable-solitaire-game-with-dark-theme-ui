@@ -3,19 +3,18 @@ import { Move } from 'lucide-react';
 
 interface GameMovesProps {
   moves: number;
+  enabled: boolean;
 }
 
-/**
- * Displays the current move counter.
- * Styled to match the GameTimer component for visual consistency.
- */
-export default function GameMoves({ moves }: GameMovesProps) {
+export default function GameMoves({ moves, enabled }: GameMovesProps) {
   return (
-    <div className="flex items-center gap-2 text-muted-foreground">
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
       <Move className="w-4 h-4" />
-      <span className="font-mono text-sm tabular-nums">
-        Moves: {moves}
-      </span>
+      {enabled ? (
+        <span className="font-mono tabular-nums">{moves}</span>
+      ) : (
+        <span className="text-xs italic">Tracking disabled</span>
+      )}
     </div>
   );
 }

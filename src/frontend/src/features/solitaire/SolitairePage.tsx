@@ -3,10 +3,14 @@ import { useSolitaireGame } from './useSolitaireGame';
 import PileView from './components/PileView';
 import GameControls from './components/GameControls';
 import WinDialog from './components/WinDialog';
+import ScoresDialog from './components/ScoresDialog';
+import NewGamePreferencesDialog from './components/NewGamePreferencesDialog';
+import GamePreferencesDialog from './components/GamePreferencesDialog';
 import GameTimer from './components/GameTimer';
 import GameMoves from './components/GameMoves';
 import { useGameTimer } from './hooks/useGameTimer';
 import { usePlaythroughResults } from './results/usePlaythroughResults';
+import { loadPreferences, savePreferences, SolitairePreferences } from './preferences/solitairePreferences';
 import { Selection, DragPayload } from './solitaireTypes';
 import { SiX, SiFacebook, SiInstagram } from 'react-icons/si';
 import { setDragData, getDragData, dragPayloadToSelection } from './solitaireDrag';
@@ -31,12 +35,16 @@ export default function SolitairePage() {
   
   const [dragOverTarget, setDragOverTarget] = useState<{ type: string; index?: number } | null>(null);
   const [gameInstanceKey, setGameInstanceKey] = useState(0);
+  const [scoresDialogOpen, setScoresDialogOpen] = useState(false);
+  const [preferencesDialogOpen, setPreferencesDialogOpen] = useState(false);
+  const [newGameDialogOpen, setNewGameDialogOpen] = useState(false);
+  const [preferences, setPreferences] = useState<SolitairePreferences>(() => loadPreferences());
   const dragSessionActive = useRef(false);
   const dropHandled = useRef(false);
   const winRecorded = useRef<number | null>(null);
   
-  // Timer hook - stops when game is won
-  const { formattedTime, elapsedSeconds } = useGameTimer(gameInstanceKey, !isWon);
+  // Timer hook - stops when game is won, respects enabled preference
+  const { formattedTime, elapsedSeconds } = useGameTimer(gameInstanceKey, !isWon, preferences.timerEnabled);
   
   // Results tracking
   const { addResult, bestTimes, bestMoves, formatTime } = usePlaythroughResults();
@@ -48,17 +56,55 @@ export default function SolitairePage() {
     }
   }, [hint, clearHint]);
   
-  // Record result when game is won (only once per game instance)
+  // Record result when game is won (only once per game instance, only if both metrics enabled)
   useEffect(() => {
     if (isWon && winRecorded.current !== gameInstanceKey) {
       winRecorded.current = gameInstanceKey;
-      addResult({ elapsedSeconds, moves });
+      // Only record if both timer and move tracking are enabled
+      if (preferences.timerEnabled && preferences.moveTrackingEnabled) {
+        addResult({ elapsedSeconds, moves });
+      }
     }
-  }, [isWon, gameInstanceKey, elapsedSeconds, moves, addResult]);
+  }, [isWon, gameInstanceKey, elapsedSeconds, moves, addResult, preferences.timerEnabled, preferences.moveTrackingEnabled]);
   
-  const handleNewGame = () => {
+  const handleNewGameRequest = () => {
+    if (preferences.askAgain) {
+      // Show preferences dialog
+      setNewGameDialogOpen(true);
+    } else {
+      // Start game immediately with saved preferences
+      startNewGame();
+    }
+  };
+  
+  const handleNewGameConfirm = (newPrefs: { timerEnabled: boolean; moveTrackingEnabled: boolean; askAgain: boolean }) => {
+    // Save preferences
+    const updatedPrefs: SolitairePreferences = {
+      timerEnabled: newPrefs.timerEnabled,
+      moveTrackingEnabled: newPrefs.moveTrackingEnabled,
+      askAgain: newPrefs.askAgain,
+    };
+    setPreferences(updatedPrefs);
+    savePreferences(updatedPrefs);
+    
+    // Close dialog and start game
+    setNewGameDialogOpen(false);
+    startNewGame();
+  };
+  
+  const startNewGame = () => {
     newGame();
     setGameInstanceKey((prev) => prev + 1);
+  };
+  
+  const handlePreferencesSave = (newPrefs: { timerEnabled: boolean; moveTrackingEnabled: boolean; askAgain: boolean }) => {
+    const updatedPrefs: SolitairePreferences = {
+      timerEnabled: newPrefs.timerEnabled,
+      moveTrackingEnabled: newPrefs.moveTrackingEnabled,
+      askAgain: newPrefs.askAgain,
+    };
+    setPreferences(updatedPrefs);
+    savePreferences(updatedPrefs);
   };
   
   const handlePileClick = (type: Selection['type'], index?: number, cardIndex?: number) => {
@@ -71,7 +117,7 @@ export default function SolitairePage() {
     if (selection) {
       // Try to move - foundations can be targets but not sources
       // Click-based moves do NOT increment the move counter (isDragMove = false)
-      move(selection, newSelection, false);
+      move(selection, newSelection, false, preferences.moveTrackingEnabled);
     } else {
       // Select - do NOT allow selecting from foundation piles
       if (type === 'waste' && gameState.waste.length > 0) {
@@ -145,8 +191,8 @@ export default function SolitairePage() {
     
     // Attempt the move - if it fails, the game state won't change
     // and the cards will remain in their original location
-    // Drag-and-drop moves DO increment the move counter (isDragMove = true)
-    move(from, to, true);
+    // Drag-and-drop moves DO increment the move counter (isDragMove = true) if tracking enabled
+    move(from, to, true, preferences.moveTrackingEnabled);
   };
   
   // Handle drops outside valid drop zones (background, header, footer, etc.)
@@ -192,12 +238,12 @@ export default function SolitairePage() {
       <header className="border-b border-border/40 bg-card/30 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 relative">
           <h1 className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 bg-clip-text text-transparent">
-            Klondike Solitaire
+            Simple Solitaire
           </h1>
           {/* Timer and Moves in upper right corner (desktop) */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-4">
-            <GameTimer formattedTime={formattedTime} />
-            <GameMoves moves={moves} />
+            <GameTimer formattedTime={formattedTime} enabled={preferences.timerEnabled} />
+            <GameMoves moves={moves} enabled={preferences.moveTrackingEnabled} />
           </div>
         </div>
       </header>
@@ -208,15 +254,17 @@ export default function SolitairePage() {
           {/* Controls and Timer/Moves (mobile) */}
           <div className="space-y-3">
             <GameControls
-              onNewGame={handleNewGame}
+              onNewGame={handleNewGameRequest}
               onUndo={undo}
               onHint={showHint}
+              onScores={() => setScoresDialogOpen(true)}
+              onPreferences={() => setPreferencesDialogOpen(true)}
               canUndo={canUndo}
             />
             {/* Timer and Moves for mobile - centered below controls */}
             <div className="flex justify-center gap-4 sm:hidden">
-              <GameTimer formattedTime={formattedTime} />
-              <GameMoves moves={moves} />
+              <GameTimer formattedTime={formattedTime} enabled={preferences.timerEnabled} />
+              <GameMoves moves={moves} enabled={preferences.moveTrackingEnabled} />
             </div>
           </div>
           
@@ -292,19 +340,19 @@ export default function SolitairePage() {
                 cards={pile}
                 onCardClick={(cardIndex) => handlePileClick('tableau', pileIndex, cardIndex)}
                 selectedIndex={
-                  selection?.type === 'tableau' && selection.index === pileIndex
+                  selection?.type === 'tableau' &&
+                  selection.index === pileIndex
                     ? selection.cardIndex
                     : undefined
                 }
                 hintedIndex={
                   hint?.from.type === 'tableau' && hint.from.index === pileIndex
                     ? hint.from.cardIndex
-                    : isHinted('tableau', pileIndex, -1)
-                    ? -1
+                    : isHinted('tableau', pileIndex, -1) 
+                    ? -1 
                     : undefined
                 }
-                isTableau={true}
-                isEmpty={true}
+                isEmpty={false}
                 emptyLabel=""
                 isDropTarget={true}
                 onDragOver={handleDragOver('tableau', pileIndex)}
@@ -326,38 +374,11 @@ export default function SolitairePage() {
       <footer className="border-t border-border/40 bg-card/30 backdrop-blur-sm py-6">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <a
-                href="https://x.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="X (Twitter)"
-              >
-                <SiX className="w-5 h-5" />
-              </a>
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Facebook"
-              >
-                <SiFacebook className="w-5 h-5" />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Instagram"
-              >
-                <SiInstagram className="w-5 h-5" />
-              </a>
-            </div>
-            
-            <p className="text-sm text-muted-foreground text-center">
-              © {new Date().getFullYear()} Built with ❤️ using{' '}
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} Simple Solitaire
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Built with ❤️ using{' '}
               <a
                 href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
                 target="_blank"
@@ -367,19 +388,76 @@ export default function SolitairePage() {
                 caffeine.ai
               </a>
             </p>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-amber-400 transition-colors"
+                aria-label="Twitter"
+              >
+                <SiX className="w-5 h-5" />
+              </a>
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-amber-400 transition-colors"
+                aria-label="Facebook"
+              >
+                <SiFacebook className="w-5 h-5" />
+              </a>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-amber-400 transition-colors"
+                aria-label="Instagram"
+              >
+                <SiInstagram className="w-5 h-5" />
+              </a>
+            </div>
           </div>
         </div>
       </footer>
       
-      {/* Win Dialog */}
-      <WinDialog 
-        open={isWon} 
-        onNewGame={handleNewGame}
+      {/* Dialogs */}
+      <WinDialog
+        open={isWon}
+        onNewGame={handleNewGameRequest}
         currentTime={elapsedSeconds}
         currentMoves={moves}
         bestTimes={bestTimes}
         bestMoves={bestMoves}
         formatTime={formatTime}
+        timerEnabled={preferences.timerEnabled}
+        moveTrackingEnabled={preferences.moveTrackingEnabled}
+      />
+      
+      <ScoresDialog
+        open={scoresDialogOpen}
+        onOpenChange={setScoresDialogOpen}
+        bestTimes={bestTimes}
+        bestMoves={bestMoves}
+        formatTime={formatTime}
+      />
+      
+      <NewGamePreferencesDialog
+        open={newGameDialogOpen}
+        onOpenChange={setNewGameDialogOpen}
+        onConfirm={handleNewGameConfirm}
+        defaultTimerEnabled={preferences.timerEnabled}
+        defaultMoveTrackingEnabled={preferences.moveTrackingEnabled}
+        defaultAskAgain={preferences.askAgain}
+      />
+      
+      <GamePreferencesDialog
+        open={preferencesDialogOpen}
+        onOpenChange={setPreferencesDialogOpen}
+        onSave={handlePreferencesSave}
+        currentTimerEnabled={preferences.timerEnabled}
+        currentMoveTrackingEnabled={preferences.moveTrackingEnabled}
+        currentAskAgain={preferences.askAgain}
       />
     </div>
   );

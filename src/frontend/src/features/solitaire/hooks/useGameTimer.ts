@@ -1,26 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 
-interface UseGameTimerReturn {
-  formattedTime: string;
-  elapsedSeconds: number;
-}
-
-/**
- * Custom hook that tracks elapsed time for a game instance.
- * Resets when gameInstanceKey changes, updates every second.
- */
-export function useGameTimer(gameInstanceKey: number, isActive: boolean = true): UseGameTimerReturn {
+export function useGameTimer(gameInstanceKey: number, isActive: boolean, enabled: boolean = true) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const intervalRef = useRef<number | null>(null);
 
-  // Reset timer when game instance changes
   useEffect(() => {
+    // Reset timer when game instance changes
     setElapsedSeconds(0);
   }, [gameInstanceKey]);
 
-  // Start/stop interval based on isActive
   useEffect(() => {
-    if (isActive) {
+    // Only run timer if enabled and active
+    if (enabled && isActive) {
       intervalRef.current = window.setInterval(() => {
         setElapsedSeconds((prev) => prev + 1);
       }, 1000);
@@ -31,26 +22,23 @@ export function useGameTimer(gameInstanceKey: number, isActive: boolean = true):
       }
     }
 
-    // Cleanup on unmount or dependency change
     return () => {
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, [isActive, gameInstanceKey]);
+  }, [isActive, enabled, gameInstanceKey]);
 
-  // Format as HH:MM:SS
   const formatTime = (totalSeconds: number): string => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   return {
-    formattedTime: formatTime(elapsedSeconds),
     elapsedSeconds,
+    formattedTime: formatTime(elapsedSeconds),
   };
 }

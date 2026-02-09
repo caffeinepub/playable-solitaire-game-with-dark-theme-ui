@@ -1,104 +1,56 @@
 {
   "kind": "build_request",
-  "title": "Store per-playthrough results and display separate best-time and best-moves leaderboards",
+  "title": "Allow closing the New Game preferences dialog via the top-right X without choosing options",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-25",
-      "text": "Record a completed-playthrough result when (and only when) the user wins a game, capturing both (a) elapsed time in seconds from the game timer and (b) the current drag-move counter value for that playthrough.",
+      "id": "REQ-40",
+      "text": "Update the \"New Game Preferences\" modal dialog so it can be dismissed via a top-right \"X\" close control (and standard dialog dismissal like ESC / clicking outside, if supported by the dialog component) without requiring the user to select any options or click \"Start Game\".",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "Let's track the time and number of moves separately storing them into two different categories. Lower time ranks higher, fewer moves ranks higher. Note the values of each for each playthrough and compile the results into a list for each stored category."
+          "Allow for user closure of open boxes via the upper-right X without selecting any options"
         ]
       },
       "acceptanceCriteria": [
-        "When the win condition is reached, exactly one result entry is created for that playthrough (no duplicate entries due to re-renders).",
-        "Each recorded entry contains both elapsedSeconds and moves for that same playthrough.",
-        "Starting a New Game resets the in-progress timer and move counter as it does today, but does not delete previously recorded results."
+        "When the New Game Preferences dialog is open, an upper-right X close button is visible and clickable.",
+        "Clicking the X closes the dialog and does not start a new game.",
+        "Clicking the X closes the dialog and does not persist/update any preferences (timer enabled, move tracking enabled, ask again).",
+        "After closing via X, the game remains in its prior state (no reset/deal triggered)."
       ]
     },
     {
-      "id": "REQ-26",
-      "text": "Persist the history of recorded playthrough results on the client so the results remain available across page reloads (e.g., using localStorage), and load the persisted results on app start.",
+      "id": "REQ-41",
+      "text": "Wire the New Game Preferences dialog to support controlled open/close behavior from the parent page (so the dialog can close when the user clicks the top-right X), and ensure the dialog's option state resets appropriately on reopen based on the current default preference props.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "...storing them into two different categories."
+          "Allow for user closure of open boxes via the upper-right X without selecting any options"
         ]
       },
       "acceptanceCriteria": [
-        "After winning at least one game, reloading the page keeps the previously recorded results available to the UI.",
-        "Persisted data is resilient to an empty/missing storage value (no crashes; defaults to empty lists)."
-      ]
-    },
-    {
-      "id": "REQ-27",
-      "text": "Compile and display two separate ranked lists derived from the recorded playthrough results: (1) Best Times ranked by lower completion time first, and (2) Best Moves ranked by fewer moves first. Each list entry must show both the primary metric and the other metric for that same playthrough (e.g., a time-ranked entry also shows its moves).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "Lower time ranks higher, fewer moves ranks higher. Note the values of each for each playthrough and compile the results into a list for each stored category."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The Best Times list is sorted ascending by elapsed time (lower ranks higher).",
-        "The Best Moves list is sorted ascending by moves (fewer ranks higher).",
-        "Each displayed row clearly shows the playthrough’s time (HH:MM:SS) and moves value.",
-        "If there are no recorded results yet, the UI shows an English empty-state message for each list (e.g., \"No completed games yet.\")."
-      ]
-    },
-    {
-      "id": "REQ-28",
-      "text": "Update the win UI so that, when the win dialog is shown, it includes the current playthrough’s completion time and moves, plus the two ranked lists (Best Times and Best Moves) in the same dialog or immediately adjacent UI section, using English labels.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "Note the values of each for each playthrough and compile the results into a list for each stored category."
-        ]
-      },
-      "acceptanceCriteria": [
-        "On win, the dialog shows the player’s completion time and moves for that win.",
-        "On win, the dialog shows both ranked lists (Best Times and Best Moves) populated from stored results.",
-        "All user-facing text added for this feature is in English.",
-        "The existing 'Play Again' action continues to start a new game as it does today."
+        "The parent page can close the New Game Preferences dialog when the user dismisses it (e.g., via an onOpenChange callback).",
+        "Re-opening the New Game Preferences dialog shows option values initialized from the latest provided defaults (not stale values from a previous open).",
+        "Closing the dialog via X/dismiss does not call the confirm/start callback."
       ]
     }
   ],
   "constraints": [
-    "Frontend files under frontend/src/components/ui must be treated as read-only and only composed, not edited.",
-    "Do not edit any paths listed in frontend.immutablePaths.",
-    "Keep all changes compatible with the existing timer hook (frontend/src/features/solitaire/hooks/useGameTimer.ts) and move counter logic (frontend/src/features/solitaire/solitaireHistory.ts)."
+    "Do not edit files under frontend/src/components/ui (shadcn UI components are read-only and must be composed/used as-is).",
+    "Keep all user-facing text in English."
   ],
   "nonGoals": [
-    "Do not add third-party authentication providers; Internet Identity remains the only supported auth option.",
-    "Do not implement real-time/multiplayer leaderboards or server-side/global rankings.",
-    "Do not change the existing Klondike rules, drag-and-drop rules, or the definition of what counts as a move (drag-and-drop successful moves only)."
+    "Do not change Klondike gameplay rules, move validation, timer logic, move counter logic, or leaderboard storage/behavior.",
+    "Do not add new settings options beyond enabling dismissal/close behavior for the existing modal."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

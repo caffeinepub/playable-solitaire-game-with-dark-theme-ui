@@ -3,17 +3,18 @@ import { Clock } from 'lucide-react';
 
 interface GameTimerProps {
   formattedTime: string;
+  enabled: boolean;
 }
 
-/**
- * Displays the elapsed game time in HH:MM:SS format.
- * Styled for the dark theme with subtle, legible appearance.
- */
-export default function GameTimer({ formattedTime }: GameTimerProps) {
+export default function GameTimer({ formattedTime, enabled }: GameTimerProps) {
   return (
-    <div className="flex items-center gap-2 text-muted-foreground">
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
       <Clock className="w-4 h-4" />
-      <span className="font-mono text-sm tabular-nums">{formattedTime}</span>
+      {enabled ? (
+        <span className="font-mono tabular-nums">{formattedTime}</span>
+      ) : (
+        <span className="text-xs italic">Timing disabled</span>
+      )}
     </div>
   );
 }

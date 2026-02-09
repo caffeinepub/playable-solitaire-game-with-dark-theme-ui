@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Store each winning playthrough’s completion time and move count, persist results locally, and show separate Best Times and Best Moves leaderboards in the win UI.
+**Goal:** Let players dismiss the “New Game Preferences” modal via a top-right close (X) control (and standard dismissal, where supported) without selecting options or starting a new game.
 
 **Planned changes:**
-- On win, record exactly one playthrough result entry containing both elapsedSeconds (from the existing timer) and moves (from the existing move counter), without duplicates from re-renders.
-- Persist recorded playthrough results on the client (e.g., localStorage) and load them on app start, handling missing/empty storage safely.
-- Derive and display two ranked lists from recorded results: Best Times (ascending by time) and Best Moves (ascending by moves), with each row showing both time (HH:MM:SS) and moves; include English empty-state messages when no results exist.
-- Update the win dialog (or adjacent UI) to show the current win’s time and moves plus both ranked lists, keeping the existing Play Again behavior unchanged.
+- Add a visible, clickable top-right “X” close control to the New Game Preferences modal using composition (without modifying read-only UI component files).
+- Wire the dialog for controlled open/close from the parent (e.g., via an open state and onOpenChange handler) so dismiss actions can close the modal.
+- Ensure dismissing/closing the dialog (X/ESC/outside click, if supported) does not trigger “Start Game” and does not persist/update any preference values.
+- Reset/initialize the dialog’s option state on each reopen from the latest default preference props (avoid stale state from prior opens).
 
-**User-visible outcome:** After winning, the player sees their completion time and moves along with two persistent leaderboards (Best Times and Best Moves) that remain available after reloading the page.
+**User-visible outcome:** When the New Game Preferences dialog is open, the user can close it using the top-right X (and other supported dismissal methods) without starting a new game or changing any saved preferences, leaving the current game state unchanged.

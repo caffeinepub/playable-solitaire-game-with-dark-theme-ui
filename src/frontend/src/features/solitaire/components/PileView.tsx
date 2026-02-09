@@ -52,13 +52,6 @@ export default function PileView({
   // Tableau: vertical offset
   const tableauOffset = 28;
   
-  // Waste: horizontal offset for last 3 cards
-  const wasteOffset = 20;
-  const wasteVisibleCount = 3;
-  
-  // Foundation: fully overlapped
-  const foundationOffset = 0;
-  
   const handleCardDragStart = (index: number) => (event: React.DragEvent) => {
     if (isDraggable && !isDraggable(index)) {
       event.preventDefault();
@@ -119,40 +112,23 @@ export default function PileView({
     );
   }
   
-  // Waste pile: show last 3 cards with horizontal offset
+  // Waste pile: show only the top card (single stack)
   if (isWasteStack) {
-    const visibleCards = cards.slice(-wasteVisibleCount);
-    const startIndex = cards.length - visibleCards.length;
+    const topCard = cards[cards.length - 1];
+    const topIndex = cards.length - 1;
+    const canDrag = isDraggable ? isDraggable(topIndex) : false;
     
     return (
-      <div className={cn('relative', className)} style={{ width: '80px', height: '112px' }}>
-        {visibleCards.map((card, i) => {
-          const actualIndex = startIndex + i;
-          const isLast = actualIndex === cards.length - 1;
-          const canDrag = isDraggable ? isDraggable(actualIndex) : false;
-          
-          return (
-            <div
-              key={card.id}
-              className="absolute"
-              style={{
-                left: `${i * wasteOffset}px`,
-                top: 0,
-                zIndex: i,
-              }}
-            >
-              <CardView
-                card={card}
-                onClick={isLast && onCardClick ? () => onCardClick(actualIndex) : undefined}
-                isSelected={selectedIndex === actualIndex}
-                isHinted={hintedIndex === actualIndex}
-                draggable={canDrag}
-                onDragStart={canDrag ? handleCardDragStart(actualIndex) : undefined}
-                onDragEnd={canDrag ? handleCardDragEnd : undefined}
-              />
-            </div>
-          );
-        })}
+      <div className={cn('relative w-16 h-24 sm:w-20 sm:h-28', className)}>
+        <CardView
+          card={topCard}
+          onClick={onCardClick ? () => onCardClick(topIndex) : undefined}
+          isSelected={selectedIndex === topIndex}
+          isHinted={hintedIndex === topIndex}
+          draggable={canDrag}
+          onDragStart={canDrag ? handleCardDragStart(topIndex) : undefined}
+          onDragEnd={canDrag ? handleCardDragEnd : undefined}
+        />
       </div>
     );
   }

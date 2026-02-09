@@ -5,39 +5,31 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
+  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Trophy, Clock, Move, Award } from 'lucide-react';
+import { Trophy, Clock, Move, X } from 'lucide-react';
 import { PlaythroughResult } from '../results/usePlaythroughResults';
 
-interface WinDialogProps {
+interface ScoresDialogProps {
   open: boolean;
-  onNewGame: () => void;
-  currentTime: number;
-  currentMoves: number;
+  onOpenChange: (open: boolean) => void;
   bestTimes: PlaythroughResult[];
   bestMoves: PlaythroughResult[];
   formatTime: (seconds: number) => string;
-  timerEnabled: boolean;
-  moveTrackingEnabled: boolean;
 }
 
-export default function WinDialog({ 
+export default function ScoresDialog({ 
   open, 
-  onNewGame, 
-  currentTime, 
-  currentMoves, 
+  onOpenChange, 
   bestTimes, 
   bestMoves, 
-  formatTime,
-  timerEnabled,
-  moveTrackingEnabled,
-}: WinDialogProps) {
+  formatTime 
+}: ScoresDialogProps) {
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <div className="flex justify-center mb-4">
@@ -45,42 +37,18 @@ export default function WinDialog({
               <Trophy className="w-10 h-10 text-amber-500" />
             </div>
           </div>
-          <DialogTitle className="text-center text-2xl">Congratulations!</DialogTitle>
+          <DialogTitle className="text-center text-2xl">Leaderboards</DialogTitle>
           <DialogDescription className="text-center text-base">
-            You've successfully completed the game. Well done!
+            Your best completed games
           </DialogDescription>
+          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </DialogClose>
         </DialogHeader>
         
         <ScrollArea className="flex-1 pr-4">
           <div className="space-y-6 py-4">
-            {/* Current Result */}
-            <div className="bg-muted/30 rounded-lg p-4 border border-border/40">
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Award className="w-5 h-5 text-amber-500" />
-                Your Result
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-muted-foreground" />
-                  {timerEnabled ? (
-                    <span className="font-mono font-semibold">{formatTime(currentTime)}</span>
-                  ) : (
-                    <span className="text-sm text-muted-foreground italic">Timing disabled</span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Move className="w-4 h-4 text-muted-foreground" />
-                  {moveTrackingEnabled ? (
-                    <span className="font-mono font-semibold">{currentMoves} moves</span>
-                  ) : (
-                    <span className="text-sm text-muted-foreground italic">Tracking disabled</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            <Separator />
-            
             {/* Best Times */}
             <div>
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
@@ -93,7 +61,7 @@ export default function WinDialog({
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {bestTimes.slice(0, 5).map((result, index) => (
+                  {bestTimes.slice(0, 10).map((result, index) => (
                     <div
                       key={result.timestamp}
                       className="flex items-center justify-between p-3 rounded-lg bg-muted/20 border border-border/40"
@@ -131,7 +99,7 @@ export default function WinDialog({
                 </p>
               ) : (
                 <div className="space-y-2">
-                  {bestMoves.slice(0, 5).map((result, index) => (
+                  {bestMoves.slice(0, 10).map((result, index) => (
                     <div
                       key={result.timestamp}
                       className="flex items-center justify-between p-3 rounded-lg bg-muted/20 border border-border/40"
@@ -157,11 +125,11 @@ export default function WinDialog({
           </div>
         </ScrollArea>
         
-        <DialogFooter>
-          <Button onClick={onNewGame} className="w-full">
-            Play Again
+        <div className="flex justify-center pt-4">
+          <Button onClick={() => onOpenChange(false)} variant="default">
+            Close
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

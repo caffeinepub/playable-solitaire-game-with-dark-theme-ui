@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 25,
+  "projectStateVersion": 37,
   "summary": "Build a simple playable solitaire game deployed to the user's personal canister, including a dark theme UI.",
   "architectural_notes": [
     "Drag-and-drop should validate drop targets; if drop is not on a valid stack location, the dragged card/run must revert to its pre-drag position/state.",
@@ -8,12 +8,16 @@
     "Consider a rules/UI mode where once a card is placed into a foundation slot it becomes locked (non-draggable/non-interactive) to prevent move-outs and avoid the foundation disappearing-card issue.",
     "Dragging a tableau stack/run (or a card with cards underneath) and dropping onto a valid stack location must correctly transfer the run; no cards should disappear. Ensure drag/drop move logic and rendering preserve card identity and pile membership for multi-card moves.",
     "Define a \"move\" as a successful drag-and-drop that results in a valid state change; do not count simple clicks/taps or stock-to-waste draws / deck cycling as moves.",
-    "Add per-playthrough stats persistence: record completion time and move count at game end and store in two separate ranked lists (time asc, moves asc), likely persisted in canister storage across sessions."
+    "Add per-playthrough stats persistence: record completion time and move count at game end and store in two separate ranked lists (time asc, moves asc), likely persisted in canister storage across sessions.",
+    "Waste pile rendering should display only the most recent (top) waste card in a single-stack position during normal play; avoid any multi-card 3-overlap/fan presentation on draw.",
+    "Add a New Game preflight prompt to opt into Timer and/or Move Tracking independently; persist the user’s \"ask again\" preference and provide a reversible UI control to re-enable prompting after selecting \"No Thanks\".",
+    "Modal prompts (e.g., New Game Timer/Move Tracking prompt) must be user-dismissible via an upper-right “X” without requiring any option selection; dismissal should leave preferences unchanged."
   ],
   "known_issues": [
     "Bug: Dragging some cards/runs and releasing them outside a valid drop target can leave them not stacked and not reverted to their original location.",
     "Bug: Moving a card from the upper four foundation slots after cards are visually stacked/overlapped can cause the dragged/moved card to disappear entirely.",
-    "Bug: Dragging a stack/run (or a card with subsequent cards underneath) onto an otherwise valid stackable tableau location can cause the dragged card(s) to disappear instead of being placed."
+    "Bug: Dragging a stack/run (or a card with subsequent cards underneath) onto an otherwise valid stackable tableau location can cause the dragged card(s) to disappear instead of being placed.",
+    "UI issue: Stock-to-waste draws can render up to three overlapping waste cards; desired behavior is a single-stack display showing only the topmost waste card."
   ],
   "isFixRequest": false,
   "existing_features": [
@@ -232,6 +236,110 @@
         "REQ-28"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-new-control-button-labeled-scores-positioned-next-to-the-existing-hint-button-in-the-main-game-controls-bar-and-wire-it-to-open-the-score-listing",
+      "title": "Add a new control button labeled \"Scores\" positioned next to the existing \"Hint\" button in the main game controls bar, and wire it to open the score listing.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-score-listing-as-a-user-closeable-pop-up-window-modal-dialog-that-displays-the-same-saved-leaderboard-data-currently-used-for-win-results-best-times-and-best-moves-and-can-be-opened-at-any-time-during-gameplay",
+      "title": "Implement the score listing as a user-closeable pop-up window (modal/dialog) that displays the same saved leaderboard data currently used for win results (Best Times and Best Moves) and can be opened at any time during gameplay.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-change-the-leaderboard-section-heading-text-from-best-moves-to-least-moves-everywhere-it-appears-in-the-ui-including-both-the-scores-modal-and-the-win-dialog-leaderboard-section",
+      "title": "Change the leaderboard section heading text from \"Best Moves\" to \"Least Moves\" everywhere it appears in the UI, including both the Scores modal and the Win dialog leaderboard section.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-stock-to-waste-draw-ui-so-the-waste-pile-renders-as-a-single-stack-display-only-the-most-recently-drawn-top-waste-card-is-visible-and-no-additional-older-waste-cards-are-rendered-overlapped-i-e-remove-the-current-up-to-3-visible-waste-cards-behavior",
+      "title": "Update the stock-to-waste draw UI so the waste pile renders as a single-stack display: only the most recently drawn (top) waste card is visible, and no additional older waste cards are rendered/overlapped (i.e., remove the current up-to-3 visible waste cards behavior).",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-game-name-to-simple-solitaire-across-all-user-visible-locations-in-the-ui-including-the-main-in-app-header-title-on-the-solitaire-page",
+      "title": "Update the game name to \"Simple Solitaire\" across all user-visible locations in the UI, including the main in-app header title on the Solitaire page.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-browser-tab-page-title-to-simple-solitaire-by-changing-the-html-document-title-in-frontend-index-html",
+      "title": "Update the browser tab/page title to \"Simple Solitaire\" by changing the HTML document <title> in frontend/index.html.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-the-user-starts-a-new-game-via-the-new-game-control-button-and-via-the-play-again-button-in-the-win-dialog-conditionally-show-a-modal-prompt-that-asks-whether-they-want-1-the-game-timer-enabled-and-2-move-tracking-enabled-as-two-separate-options",
+      "title": "When the user starts a new game (via the \"New Game\" control button and via the \"Play Again\" button in the win dialog), conditionally show a modal prompt that asks whether they want (1) the game timer enabled and (2) move tracking enabled as two separate options.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-ask-again-preference-to-the-new-game-prompt-that-controls-whether-the-prompt-appears-on-future-new-games-and-persist-this-preference-client-side-so-it-is-remembered-across-page-reloads",
+      "title": "Add an \"Ask Again?\" preference to the New Game prompt that controls whether the prompt appears on future new games, and persist this preference client-side so it is remembered across page reloads.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-persist-the-user-s-timer-and-move-tracking-choices-client-side-and-apply-them-to-gameplay-timer-choice-must-control-whether-elapsed-time-is-tracked-displayed-move-tracking-choice-must-control-whether-the-move-counter-increments",
+      "title": "Persist the user's Timer and Move Tracking choices client-side and apply them to gameplay: Timer choice must control whether elapsed time is tracked/displayed; Move Tracking choice must control whether the move counter increments.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-no-thanks-do-not-ask-again-state-reversible-via-explicit-user-input-by-providing-an-in-app-ui-entry-point-that-allows-the-user-to-re-enable-ask-again-and-adjust-timer-move-tracking-preferences",
+      "title": "Make the \"No Thanks\" (do not ask again) state reversible via explicit user input by providing an in-app UI entry point that allows the user to re-enable \"Ask Again?\" and adjust Timer/Move Tracking preferences.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-win-result-recording-and-leaderboard-behavior-remains-stable-when-timer-and-or-move-tracking-are-disabled-without-breaking-the-win-dialog-or-scores-dialog",
+      "title": "Ensure win-result recording and leaderboard behavior remains stable when Timer and/or Move Tracking are disabled, without breaking the win dialog or Scores dialog.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-new-game-preferences-modal-dialog-so-it-can-be-dismissed-via-a-top-right-x-close-control-and-standard-dialog-dismissal-like-esc-clicking-outside-if-supported-by-the-dialog-component-without-requiring-the-user-to-select-any-options-or-click-start-game",
+      "title": "Update the \"New Game Preferences\" modal dialog so it can be dismissed via a top-right \"X\" close control (and standard dialog dismissal like ESC / clicking outside, if supported by the dialog component) without requiring the user to select any options or click \"Start Game\".",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-the-new-game-preferences-dialog-to-support-controlled-open-close-behavior-from-the-parent-page-so-the-dialog-can-close-when-the-user-clicks-the-top-right-x-and-ensure-the-dialog-s-option-state-resets-appropriately-on-reopen-based-on-the-current-default-preference-props",
+      "title": "Wire the New Game Preferences dialog to support controlled open/close behavior from the parent page (so the dialog can close when the user clicks the top-right X), and ensure the dialog's option state resets appropriately on reopen based on the current default preference props.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -308,10 +416,40 @@
       "summary": "Track and store per-playthrough results in two separate ranked categories: best (lowest) completion time and best (fewest) moves, and maintain/display a compiled list for each category",
       "reqIds": [],
       "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Add a \"Scores\" option next to \"Hint\" that opens the score listing in a user-closeable pop-up window/modal",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Change the leaderboard heading text from \"Best Moves\" to \"Least Moves\" (Scores modal and win dialog/adjacent score UI)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Update stock-to-waste draw UI so only a single top waste card is visibly stacked/shown (no multi-card 3-overlap/fan) when drawing new cards",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "On New Game, prompt user to enable Timer and/or Move Tracking (two separate options) with a remembered preference via an \"Ask Again?\" checkbox; allow disabling future prompts via \"No Thanks\" and make that state reversible via user input",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Allow users to close/dismiss open modal boxes (e.g., the New Game Timer/Move Tracking prompt) via an upper-right “X” without selecting any options",
+      "reqIds": [],
+      "status": "pending"
     }
   ],
   "gameProjectType": "2d",
-  "projectName": "Playable Solitaire game with dark theme UI",
+  "projectName": "Simple Solitaire",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -1,9 +1,22 @@
 import { GameState } from './solitaireTypes';
 
+export interface HistorySnapshot {
+  state: GameState;
+  moves: number;
+}
+
 export interface HistoryState {
-  past: Array<{ state: GameState; moves: number }>;
+  past: HistorySnapshot[];
   present: GameState;
   moves: number;
+}
+
+export function createSnapshot(state: GameState, moves: number): HistorySnapshot {
+  return { state, moves };
+}
+
+export function restoreSnapshot(snapshot: HistorySnapshot): GameState {
+  return snapshot.state;
 }
 
 export function createHistory(initialState: GameState): HistoryState {
