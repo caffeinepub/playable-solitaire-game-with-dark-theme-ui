@@ -1,0 +1,58 @@
+{
+  "kind": "build_request",
+  "title": "Fix disappearing card when dragging from stacked foundation piles",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-15",
+      "text": "Investigate and fix the bug where dragging/moving the top card from one of the four foundation piles (after the foundation has multiple cards stacked/overlapped) can cause the dragged/moved card to disappear from the UI.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "When stacked cards in the upper four slots are put in a stacked state, then moved, the card disappears entirely. Can you determine why this is?"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Repro case no longer occurs: with 2+ cards in a foundation, dragging the top card to a valid destination (tableau or another foundation when rules allow) results in the card appearing in the destination and the source foundation showing the next card underneath (or the empty-slot placeholder when emptied).",
+        "If the drag from a foundation pile is canceled (dropped outside any valid drop zone) the card does not disappear; the source foundation still shows the same top card as before the drag.",
+        "If the drag from a foundation pile is dropped onto an invalid target, the move is canceled and the card does not disappear; the source foundation remains unchanged.",
+        "No other piles (waste/tableau) regress in drag-and-drop behavior or rendering."
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "text": "Harden foundation pile rendering so React reconciliation cannot incorrectly unmount/lose the rendered card when the foundation top card changes during a move (e.g., ensure stable, card-identity-based keys for rendered cards where applicable, including foundation top-card rendering).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages"
+        ],
+        "quotes": [
+          "the card disappears entirely"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When repeatedly moving cards off a foundation pile (one by one), each newly revealed top card renders reliably (no blank/empty foundation container while cards remain).",
+        "When moving cards onto a foundation pile (building up), the visible top card always matches the last card in that foundation array.",
+        "There are no React console warnings about missing/unstable keys in pile/card rendering during typical play (dealing, drawing, dragging between piles)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Frontend must not modify any files under frontend/src/components/ui or any paths listed in frontend.immutablePaths in SYSTEM_CONTEXT.",
+    "Keep the backend as-is (single-actor Motoko canister is currently minimal and not involved in solitaire state).",
+    "Use English for any user-facing text."
+  ],
+  "nonGoals": [
+    "Adding new game modes/rules beyond Klondike.",
+    "Adding animations or new visual themes as part of this fix (unless required to resolve the disappearance bug).",
+    "Implementing persistence or backend storage for game state."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

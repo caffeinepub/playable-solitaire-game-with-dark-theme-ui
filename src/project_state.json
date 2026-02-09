@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 15,
+  "summary": "Build a simple playable solitaire game deployed to the user's personal canister, including a dark theme UI.",
+  "architectural_notes": [
+    "Drag-and-drop should validate drop targets; if drop is not on a valid stack location, the dragged card/run must revert to its pre-drag position/state.",
+    "Foundation (upper four slots) stacked/overlapped rendering must preserve correct z-index/positioning and draggable top-card visibility when moving cards; moving a stacked foundation card should not unmount or visually hide it."
+  ],
+  "known_issues": [
+    "Bug: Dragging some cards/runs and releasing them outside a valid drop target can leave them not stacked and not reverted to their original location.",
+    "Bug: Moving a card from the upper four foundation slots after cards are visually stacked/overlapped can cause the dragged/moved card to disappear entirely."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-create-a-single-page-klondike-solitaire-game-ui-that-is-immediately-playable-in-the-browser-including-tableau-foundation-stock-waste-and-a-visible-card-back-front-design",
+      "title": "Create a single-page Klondike Solitaire game UI that is immediately playable in the browser, including tableau, foundation, stock, waste, and a visible card back/front design.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-core-klondike-solitaire-rules-and-interactions-deal-a-standard-52-card-deck-into-the-tableau-1-7-with-top-card-face-up-allow-drawing-from-stock-to-waste-allow-moving-cards-piles-between-tableau-according-to-alternating-color-and-descending-rank-and-allow-moving-cards-to-foundation-by-ascending-rank-and-matching-suit",
+      "title": "Implement core Klondike Solitaire rules and interactions: deal a standard 52-card deck into the tableau (1..7 with top card face-up), allow drawing from stock to waste, allow moving cards/piles between tableau according to alternating color and descending rank, and allow moving cards to foundation by ascending rank and matching suit.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-basic-game-controls-new-game-undo-at-least-one-step-undo-and-an-optional-hint-that-highlights-a-valid-move-without-auto-playing-it",
+      "title": "Add basic game controls: New Game, Undo (at least one-step undo), and an optional Hint that highlights a valid move without auto-playing it.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-clear-win-complete-detection-all-foundations-to-king-and-display-a-win-state-with-an-option-to-start-a-new-game",
+      "title": "Provide clear win/complete detection (all foundations to King) and display a win state with an option to start a new game.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-coherent-dark-theme-visual-style-across-the-entire-ui-using-a-consistent-palette-typography-spacing-and-component-styling-avoid-blue-purple-as-the-primary-accents",
+      "title": "Implement a coherent dark theme visual style across the entire UI, using a consistent palette, typography, spacing, and component styling (avoid blue/purple as the primary accents).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-solitaire-game-layout-is-responsive-and-usable-on-common-desktop-and-mobile-viewport-sizes-including-touch-friendly-interactions-for-moving-cards",
+      "title": "Ensure the Solitaire game layout is responsive and usable on common desktop and mobile viewport sizes, including touch-friendly interactions for moving cards.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-change-the-waste-pile-ui-so-that-when-drawing-from-stock-newly-drawn-cards-visually-stack-overlap-on-top-of-previous-waste-cards-instead-of-causing-the-waste-pile-to-grow-downward-as-more-cards-are-drawn-the-topmost-most-recently-drawn-waste-card-must-remain-the-interactive-card-for-selection-moves-and-hint-highlighting",
+      "title": "Change the waste pile UI so that when drawing from stock, newly drawn cards visually stack/overlap on top of previous waste cards (instead of causing the waste pile to grow downward as more cards are drawn). The topmost (most recently drawn) waste card must remain the interactive card for selection, moves, and hint highlighting.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refine-the-waste-pile-visual-stacking-so-the-horizontal-overlap-offset-is-capped-to-a-maximum-of-1-space-newly-drawn-waste-cards-should-appear-essentially-in-the-same-position-and-visually-cover-the-previous-waste-card-no-growing-horizontal-fan-the-topmost-most-recently-drawn-waste-card-must-remain-the-only-interactive-hoverable-clickable-card-for-selection-moves-and-hint-highlighting",
+      "title": "Refine the waste pile visual stacking so the horizontal overlap offset is capped to a maximum of 1 space: newly drawn waste cards should appear essentially in the same position and visually cover the previous waste card (no growing horizontal fan). The topmost (most recently drawn) waste card must remain the only interactive/hoverable/clickable card for selection, moves, and hint highlighting.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-click-and-drag-drag-and-drop-interactions-so-players-can-move-cards-and-valid-face-up-runs-by-dragging-from-the-waste-or-tableau-and-dropping-onto-a-tableau-pile-using-the-existing-klondike-rule-descending-rank-with-alternating-red-black-colors-suit-is-irrelevant-for-tableau-stacking",
+      "title": "Add click-and-drag (drag-and-drop) interactions so players can move cards (and valid face-up runs) by dragging from the waste or tableau and dropping onto a tableau pile, using the existing Klondike rule: descending rank with alternating red/black colors (suit is irrelevant for tableau stacking).",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-click-and-drag-drag-and-drop-interactions-so-players-can-move-a-single-card-by-dragging-from-the-waste-tableau-or-foundation-and-dropping-onto-one-of-the-four-foundation-piles-using-the-existing-klondike-rule-same-suit-only-ascending-rank-starting-from-ace-color-alternation-is-irrelevant-for-foundation-stacking",
+      "title": "Add click-and-drag (drag-and-drop) interactions so players can move a single card by dragging from the waste, tableau, or foundation and dropping onto one of the four foundation piles, using the existing Klondike rule: same suit only, ascending rank starting from Ace (color alternation is irrelevant for foundation stacking).",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-the-tableau-7-piles-horizontal-layout-so-the-seven-tableau-stacks-are-spaced-outward-horizontally-to-match-the-spacing-alignment-of-the-four-foundation-suit-slots-above-while-remaining-responsive-on-smaller-viewports",
+      "title": "Adjust the tableau (7 piles) horizontal layout so the seven tableau stacks are spaced outward horizontally to match the spacing/alignment of the four foundation (suit) slots above, while remaining responsive on smaller viewports.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-change-the-foundation-pile-visual-stacking-so-that-when-a-correctly-ascending-suit-card-is-added-to-a-foundation-the-newly-placed-card-visually-covers-overlaps-the-previous-lower-card-no-visible-fanned-vertical-growth-of-the-foundation-pile-only-the-topmost-foundation-card-should-remain-the-primary-interactive-draggable-card",
+      "title": "Change the foundation pile visual stacking so that when a correctly ascending suit card is added to a foundation, the newly placed card visually covers/overlaps the previous lower card (no visible fanned/vertical growth of the foundation pile). Only the topmost foundation card should remain the primary interactive/draggable card.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-that-when-a-card-waste-foundation-or-a-face-up-run-tableau-is-dragged-but-not-dropped-onto-a-valid-drop-target-the-game-state-and-ui-fully-revert-to-the-pre-drag-state-i-e-the-dragged-cards-remain-in-their-original-pile-and-do-not-appear-stranded-misaligned",
+      "title": "Ensure that when a card (waste/foundation) or a face-up run (tableau) is dragged but not dropped onto a valid drop target, the game state and UI fully revert to the pre-drag state (i.e., the dragged cards remain in their original pile and do not appear stranded/misaligned).",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-a-drag-is-dropped-onto-a-tableau-foundation-drop-zone-but-the-move-is-invalid-by-klondike-rules-treat-it-as-a-canceled-drop-do-not-change-state-and-ensure-the-dragged-card-s-visually-remain-in-their-original-pile-no-disappearing-or-stranded-rendering",
+      "title": "When a drag is dropped onto a tableau/foundation drop zone but the move is invalid by Klondike rules, treat it as a canceled drop: do not change state, and ensure the dragged card(s) visually remain in their original pile (no disappearing or stranded rendering).",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-investigate-and-fix-the-bug-where-dragging-moving-the-top-card-from-one-of-the-four-foundation-piles-after-the-foundation-has-multiple-cards-stacked-overlapped-can-cause-the-dragged-moved-card-to-disappear-from-the-ui",
+      "title": "Investigate and fix the bug where dragging/moving the top card from one of the four foundation piles (after the foundation has multiple cards stacked/overlapped) can cause the dragged/moved card to disappear from the UI.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-harden-foundation-pile-rendering-so-react-reconciliation-cannot-incorrectly-unmount-lose-the-rendered-card-when-the-foundation-top-card-changes-during-a-move-e-g-ensure-stable-card-identity-based-keys-for-rendered-cards-where-applicable-including-foundation-top-card-rendering",
+      "title": "Harden foundation pile rendering so React reconciliation cannot incorrectly unmount/lose the rendered card when the foundation top card changes during a move (e.g., ensure stable, card-identity-based keys for rendered cards where applicable, including foundation top-card rendering).",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create a playable solitaire game deployed in the user's personal canister",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Include a dark theme for the solitaire game's UI",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Change stock-to-waste draw behavior so newly drawn cards stack/overlap on top of previous waste cards instead of dropping downward each draw",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Refine waste pile stacking so the overlap offset is capped at 1 space and each newly drawn waste card covers the previous card (minimal/near-zero visible spacing)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Enable click-and-drag (drag-and-drop) card movement for tableau stacking (alternating red/black, descending rank) and foundation stacking (same suit, ascending from Ace)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Adjust layout spacing so the 7 tableau stacks are spaced outward horizontally to match the spacing of the foundation (suit) slots above",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Change foundation pile visual stacking so newly placed ascending suit cards cover/overlap the previous lower card (instead of showing a fanned stack)",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "2d",
+  "projectName": "Playable Solitaire game with dark theme UI",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

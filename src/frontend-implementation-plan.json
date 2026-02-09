@@ -1,0 +1,50 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Solitaire: Fix foundation drag disappearance + stabilize foundation rendering keys",
+  "requirements": [
+    {
+      "id": "REQ-15",
+      "summary": "Fix the UI bug where dragging the top card from a multi-card foundation can cause the card to disappear after valid/invalid/canceled drags.",
+      "acceptanceCriteria": [
+        "Repro case no longer occurs: with 2+ cards in a foundation, dragging the top card to a valid destination (tableau or another foundation when rules allow) results in the card appearing in the destination and the source foundation showing the next card underneath (or the empty-slot placeholder when emptied).",
+        "If the drag from a foundation pile is canceled (dropped outside any valid drop zone) the card does not disappear; the source foundation still shows the same top card as before the drag.",
+        "If the drag from a foundation pile is dropped onto an invalid target, the move is canceled and the card does not disappear; the source foundation remains unchanged.",
+        "No other piles (waste/tableau) regress in drag-and-drop behavior or rendering."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/solitaire/components/PileView.tsx",
+          "operation": "modify",
+          "description": "Adjust foundation stack rendering to be resilient during HTML5 drag sessions (including when the top card changes after a move), ensuring the source foundation never temporarily renders blank/loses its top card. Use card-identity-based rendering (e.g., a wrapper keyed by the top card id) so the newly revealed top card reliably re-renders after a drag/move cycle."
+        },
+        {
+          "path": "frontend/src/features/solitaire/SolitairePage.tsx",
+          "operation": "modify",
+          "description": "Harden drag lifecycle handling for foundation drags: ensure drag session flags (dragSessionActive/dropHandled) and drag-over state are consistently cleared for canceled drops and invalid drops, without mutating game state. Confirm foundation drag start/drop paths do not inadvertently trigger UI state that could hide the source pile/card."
+        }
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "summary": "Harden foundation pile rendering against React reconciliation issues by using stable, card-identity-based keys for pile/card rendering (especially foundation top-card).",
+      "acceptanceCriteria": [
+        "When repeatedly moving cards off a foundation pile (one by one), each newly revealed top card renders reliably (no blank/empty foundation container while cards remain).",
+        "When moving cards onto a foundation pile (building up), the visible top card always matches the last card in that foundation array.",
+        "There are no React console warnings about missing/unstable keys in pile/card rendering during typical play (dealing, drawing, dragging between piles)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/solitaire/components/PileView.tsx",
+          "operation": "modify",
+          "description": "Replace index-based React keys with stable card-identity keys where cards are mapped (tableau and waste visible cards), using each Card.id. For foundation rendering, ensure the rendered top card is keyed by card identity (e.g., key={topCard.id}) so React reliably replaces the DOM when the foundation top card changes."
+        },
+        {
+          "path": "frontend/src/features/solitaire/components/CardView.tsx",
+          "operation": "modify",
+          "description": "If needed to support stable keying/drag rendering, ensure CardView’s root element structure remains consistent across rerenders (faceUp/faceDown) so React can swap cards cleanly when keyed by Card.id, and confirm drag handlers do not rely on unstable indices."
+        }
+      ]
+    }
+  ]
+}
