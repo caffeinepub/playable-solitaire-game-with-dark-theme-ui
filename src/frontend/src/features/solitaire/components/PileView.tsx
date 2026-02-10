@@ -41,38 +41,13 @@ export default function PileView({
   onDragEnd,
   isDraggedOver = false,
 }: PileViewProps) {
-  // Empty pile placeholder
-  if (cards.length === 0 && isEmpty) {
-    return (
-      <div
-        className={`
-          relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 border-dashed 
-          ${isDraggedOver 
-            ? 'border-amber-400 bg-amber-400/20' 
-            : 'border-border/40 bg-muted/20'
-          }
-          flex items-center justify-center
-          ${isDropTarget ? 'transition-all duration-200' : ''}
-          ${isTableau ? 'min-h-[6rem] sm:min-h-[7rem]' : ''}
-        `}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onDrop={onDrop}
-      >
-        <span className="text-2xl sm:text-3xl text-muted-foreground/30 font-bold select-none">
-          {emptyLabel}
-        </span>
-      </div>
-    );
-  }
-
   // Waste pile - show only top card
   if (isWasteStack) {
     const topCard = cards[cards.length - 1];
     if (!topCard) {
       return (
         <div className="relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 border-dashed border-border/40 bg-muted/20 flex items-center justify-center">
-          <span className="text-xs text-muted-foreground/50 font-medium">Waste</span>
+          <span className="text-xs text-muted-foreground/50 font-medium text-center px-1">Relax & Enjoy</span>
         </div>
       );
     }
@@ -156,10 +131,10 @@ export default function PileView({
         onDragLeave={onDragLeave}
         onDrop={onDrop}
       >
-        {cards.length === 0 && isEmpty ? (
+        {cards.length === 0 ? (
           <div className="relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 border-dashed border-border/40 bg-muted/20 flex items-center justify-center">
             <span className="text-2xl sm:text-3xl text-muted-foreground/30 font-bold select-none">
-              {emptyLabel}
+              K
             </span>
           </div>
         ) : (

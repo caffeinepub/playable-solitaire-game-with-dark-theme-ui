@@ -1,90 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Inspect and fix solitaire card styles causing reflective artifacts in Chromium",
+  "title": "Publish the app in live mode (production)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Audit and update the solitaire card component styling so cards render without reflection/shine-like artifacts in Chromium browsers (Chrome/Edge) across all piles (stock/back-of-card, waste, foundation, tableau).",
+      "text": "Switch the frontend publishing configuration from Draft Mode to Live Mode for the production build by setting the publishing environment variable to live (VITE_PUBLISHING_STATE=live) and ensuring draft-only UI elements are not shown.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-4"
         ],
         "quotes": [
-          "inspect the card styles"
+          "This looks great, just as envisioned! Let's publish live"
         ]
       },
       "acceptanceCriteria": [
-        "In Chrome and Edge, cards do not show any mirrored/reflection-like artifact beneath or around the card during idle, hover, drag, and drop states.",
-        "The fix applies consistently to face-up and face-down cards and to cards rendered in waste, foundation, and tableau piles.",
-        "Card visuals (border radius, border, suit colors, and general shadow presence) remain coherent and do not regress in Firefox/Safari."
+        "When built with VITE_PUBLISHING_STATE=live, the app runs in live mode (publishingState resolves to 'live').",
+        "The Draft indicator badge is not rendered anywhere in live mode.",
+        "When built with VITE_PUBLISHING_STATE=draft, the Draft indicator badge still appears (no regression to draft behavior)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Remove or replace any transform-based hover/active visual effects on cards and card containers that could trigger unwanted GPU compositing artifacts, while preserving clear hover/pressed affordances using non-transform styling (e.g., ring/outline/brightness).",
+      "text": "Ensure the robots meta policy behaves correctly in Live Mode so search engines can index the site: in live mode set robots to \"index, follow\"; in draft/maintenance set robots to \"noindex, nofollow\".",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-4"
         ],
         "quotes": [
-          "inspect the card styles"
+          "Let's publish live"
         ]
       },
       "acceptanceCriteria": [
-        "No card element or its immediate wrapper applies transform-based scaling/3D transforms for hover/active feedback.",
-        "Hover/active feedback remains visible and accessible (e.g., ring or outline) for clickable/draggable face-up cards.",
-        "Dragging a card does not introduce new shadows/reflections during the drag operation in Chrome/Edge."
+        "In live mode, the rendered <meta name=\"robots\"> content is \"index, follow\".",
+        "In draft mode, the rendered <meta name=\"robots\"> content is \"noindex, nofollow\".",
+        "In maintenance mode, the rendered <meta name=\"robots\"> content is \"noindex, nofollow\"."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Harden global CSS defenses specifically for the card element and its wrappers to disable reflection-causing properties (e.g., -webkit-box-reflect, filter/backdrop-filter, mix-blend-mode, 3D transform settings) without breaking legitimate styling elsewhere.",
+      "text": "Add/adjust frontend environment configuration files/documentation so it is straightforward to publish live (e.g., provide a live env configuration alongside the existing draft env configuration) without requiring code changes.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7"
+          "msg-4"
         ],
         "quotes": [
-          "inspect the card styles"
+          "Let's publish live"
         ]
       },
       "acceptanceCriteria": [
-        "Global CSS rules explicitly neutralize reflection- and compositing-prone properties for the card element selector(s) and the card wrapper selector(s).",
-        "Defensive CSS targets the actual card elements and wrappers used by the solitaire UI (including data attributes and existing utility classes).",
-        "No new visual regressions appear in non-card UI elements (dialogs, buttons, header) due to overly broad CSS selectors."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Verify and, if needed, adjust the Tailwind shadow token used by cards (shadow-card) so it uses a standard, subtle box-shadow that does not trigger reflection-like artifacts in Chromium, and ensure shadow appearance is consistent between face-up and face-down cards.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-7"
-        ],
-        "quotes": [
-          "inspect the card styles"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The card shadow uses a conventional box-shadow (no filters) and renders consistently in Chrome/Edge without reflective artifacts.",
-        "Face-up and face-down cards both use the same safe shadow approach (or a deliberately chosen, safe variant) with consistent visual weight.",
-        "Any Tailwind theme/shadow changes do not break other components that rely on existing shadow tokens."
+        "Repository includes a clearly named live-mode env example/config (or updated publishing README instructions) that specifies VITE_PUBLISHING_STATE=live.",
+        "The existing draft env configuration remains available and unchanged for draft deployments."
       ]
     }
   ],
   "constraints": [
-    "Frontend immutable paths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui) must not be edited.",
-    "Backend must remain single-actor; no new backend services.",
-    "Do not introduce WebSockets/real-time messaging, third-party auth providers, or external databases."
+    "Do not modify files under frontend/src/components/ui (read-only).",
+    "Do not modify immutable hook files (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
+    "Keep backend as a single Motoko actor; no new backend services or external databases."
   ],
   "nonGoals": [
-    "Adding new gameplay features or changing solitaire rules.",
-    "Implementing backend persistence for game state or scores (current localStorage approach is out of scope unless required for styling fixes).",
-    "Redesigning the overall page theme beyond what is necessary to resolve the reflective artifact and keep card visuals consistent."
+    "Adding new gameplay features or changing Solitaire rules.",
+    "Implementing new authentication providers beyond Internet Identity.",
+    "Introducing real-time features (WebSockets/chat) or external integrations."
   ],
   "imageRequirements": {
     "required": [],

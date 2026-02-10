@@ -14,6 +14,7 @@ import { loadPreferences, savePreferences, SolitairePreferences } from './prefer
 import { Selection, DragPayload } from './solitaireTypes';
 import { SiX, SiFacebook, SiInstagram } from 'react-icons/si';
 import { setDragData, getDragData, dragPayloadToSelection } from './solitaireDrag';
+import { disableAdvancedShading } from '../../config/visualEffects';
 
 export default function SolitairePage() {
   const {
@@ -223,9 +224,12 @@ export default function SolitairePage() {
     return pile.length > 0 && cardIndex === pile.length - 1;
   };
   
+  // Suit symbols for foundation placeholders
+  const suitSymbols = ['♠', '♥', '♦', '♣'];
+  
   return (
     <div 
-      className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+      className={`min-h-screen flex flex-col ${disableAdvancedShading ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'}`}
       onDragOver={handleDocumentDragOver}
       onDrop={handleDocumentDrop}
     >
@@ -233,7 +237,7 @@ export default function SolitairePage() {
       <header className="border-b border-border/40 bg-card/20">
         <div className="container mx-auto px-4 py-4 relative">
           <h1 className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 bg-clip-text text-transparent">
-            Simple Solitaire
+            Relax & Enjoy
           </h1>
           {/* Timer and Moves in upper right corner (desktop) */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-4">
@@ -270,7 +274,7 @@ export default function SolitairePage() {
             {/* Stock pile */}
             <div
               data-card-wrapper="stock"
-              className="solitaire-card-wrapper relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 bg-gradient-to-br from-blue-600 to-blue-800 border-blue-700 shadow-card flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-amber-300 active:ring-4 active:ring-amber-500"
+              className={`solitaire-card-wrapper relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 overflow-hidden ${disableAdvancedShading ? 'bg-blue-700' : 'bg-gradient-to-br from-blue-600 to-blue-800'} border-blue-700 ${disableAdvancedShading ? '' : 'shadow-card'} flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-amber-300 active:ring-4 active:ring-amber-500`}
               onClick={draw}
             >
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-blue-400/30" />
@@ -307,19 +311,17 @@ export default function SolitairePage() {
                     ? -1
                     : undefined
                 }
-                isEmpty={true}
-                emptyLabel={['A', 'A', 'A', 'A'][index]}
                 isFoundationStack={true}
-                isDropTarget={true}
-                onDragOver={handleDragOver('foundation', index)}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop('foundation', index)}
-                isDraggedOver={dragOverTarget?.type === 'foundation' && dragOverTarget.index === index}
+                emptyLabel={suitSymbols[index]}
                 isDraggable={isFoundationDraggable(index)}
                 onDragStart={(cardIndex, event) => {
                   handleDragStart({ type: 'foundation', index, cardIndex }, event);
                 }}
                 onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver('foundation', index)}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop('foundation', index)}
+                isDraggedOver={dragOverTarget?.type === 'foundation' && dragOverTarget.index === index}
               />
             ))}
           </div>
@@ -339,19 +341,16 @@ export default function SolitairePage() {
                     ? -1
                     : undefined
                 }
-                isEmpty={true}
-                emptyLabel="K"
                 isTableau={true}
-                isDropTarget={true}
-                onDragOver={handleDragOver('tableau', index)}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop('tableau', index)}
-                isDraggedOver={dragOverTarget?.type === 'tableau' && dragOverTarget.index === index}
                 isDraggable={isTableauDraggable(index)}
                 onDragStart={(cardIndex, event) => {
                   handleDragStart({ type: 'tableau', index, cardIndex }, event);
                 }}
                 onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver('tableau', index)}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop('tableau', index)}
+                isDraggedOver={dragOverTarget?.type === 'tableau' && dragOverTarget.index === index}
               />
             ))}
           </div>
@@ -359,14 +358,14 @@ export default function SolitairePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 bg-card/20 py-6">
+      <footer className="border-t border-border/40 bg-card/20 py-4">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground text-center sm:text-left">
-              © {new Date().getFullYear()} Built with ❤️ using{' '}
+            <div className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} Relax & Enjoy. Built with ❤️ using{' '}
               <a
                 href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(
-                  typeof window !== 'undefined' ? window.location.hostname : 'solitaire-app'
+                  typeof window !== 'undefined' ? window.location.hostname : 'simple-solitaire'
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -374,14 +373,14 @@ export default function SolitairePage() {
               >
                 caffeine.ai
               </a>
-            </p>
+            </div>
             <div className="flex items-center gap-4">
               <a
-                href="https://x.com"
+                href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="X (Twitter)"
+                className="text-muted-foreground hover:text-amber-400 transition-colors"
+                aria-label="Twitter"
               >
                 <SiX className="w-5 h-5" />
               </a>
@@ -389,7 +388,7 @@ export default function SolitairePage() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-amber-400 transition-colors"
                 aria-label="Facebook"
               >
                 <SiFacebook className="w-5 h-5" />
@@ -398,7 +397,7 @@ export default function SolitairePage() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-amber-400 transition-colors"
                 aria-label="Instagram"
               >
                 <SiInstagram className="w-5 h-5" />

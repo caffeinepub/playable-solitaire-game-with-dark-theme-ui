@@ -1,48 +1,47 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
-  "known_issues": [
-    "Reflective/shiny rendering anomalies persist in Chromium browsers (Chrome/Edge), likely related to card styling/compositing (shadows/filters/transforms)."
+  "summary": "Project moving from draft/staging state toward publishing live.",
+  "architectural_notes": [
+    "Define/execute a production publish process (build + deploy to live)."
   ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-audit-and-update-the-solitaire-card-component-styling-so-cards-render-without-reflection-shine-like-artifacts-in-chromium-browsers-chrome-edge-across-all-piles-stock-back-of-card-waste-foundation-tableau",
-      "title": "Audit and update the solitaire card component styling so cards render without reflection/shine-like artifacts in Chromium browsers (Chrome/Edge) across all piles (stock/back-of-card, waste, foundation, tableau).",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-remove-or-replace-any-transform-based-hover-active-visual-effects-on-cards-and-card-containers-that-could-trigger-unwanted-gpu-compositing-artifacts-while-preserving-clear-hover-pressed-affordances-using-non-transform-styling-e-g-ring-outline-brightness",
-      "title": "Remove or replace any transform-based hover/active visual effects on cards and card containers that could trigger unwanted GPU compositing artifacts, while preserving clear hover/pressed affordances using non-transform styling (e.g., ring/outline/brightness).",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-harden-global-css-defenses-specifically-for-the-card-element-and-its-wrappers-to-disable-reflection-causing-properties-e-g-webkit-box-reflect-filter-backdrop-filter-mix-blend-mode-3d-transform-settings-without-breaking-legitimate-styling-elsewhere",
-      "title": "Harden global CSS defenses specifically for the card element and its wrappers to disable reflection-causing properties (e.g., -webkit-box-reflect, filter/backdrop-filter, mix-blend-mode, 3D transform settings) without breaking legitimate styling elsewhere.",
+      "id": "feature-add-adjust-frontend-environment-configuration-files-documentation-so-it-is-straightforward-to-publish-live-e-g-provide-a-live-env-configuration-alongside-the-existing-draft-env-configuration-without-requiring-code-changes",
+      "title": "Add/adjust frontend environment configuration files/documentation so it is straightforward to publish live (e.g., provide a live env configuration alongside the existing draft env configuration) without requiring code changes.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-verify-and-if-needed-adjust-the-tailwind-shadow-token-used-by-cards-shadow-card-so-it-uses-a-standard-subtle-box-shadow-that-does-not-trigger-reflection-like-artifacts-in-chromium-and-ensure-shadow-appearance-is-consistent-between-face-up-and-face-down-cards",
-      "title": "Verify and, if needed, adjust the Tailwind shadow token used by cards (shadow-card) so it uses a standard, subtle box-shadow that does not trigger reflection-like artifacts in Chromium, and ensure shadow appearance is consistent between face-up and face-down cards.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Inspect and fix solitaire card styles causing reflective artifacts in Chromium",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Publish the current build live (production release)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Switch the frontend publishing configuration from Draft Mode to Live Mode for the production build by setting the publishing environment variable to live (VITE_PUBLISHING_STATE=live) and ensuring draft-only UI elements are not shown.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Ensure the robots meta policy behaves correctly in Live Mode so search engines can index the site: in live mode set robots to \"index, follow\"; in draft/maintenance set robots to \"noindex, nofollow\".",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Publish the app in live mode (production)",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

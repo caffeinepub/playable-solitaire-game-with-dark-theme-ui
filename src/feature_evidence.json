@@ -2,49 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-audit-and-update-the-solitaire-card-component-styling-so-cards-render-without-reflection-shine-like-artifacts-in-chromium-browsers-chrome-edge-across-all-piles-stock-back-of-card-waste-foundation-tableau",
-      "featureTitle": "Audit and update the solitaire card component styling so cards render without reflection/shine-like artifacts in Chromium browsers (Chrome/Edge) across all piles (stock/back-of-card, waste, foundation, tableau).",
+      "featureId": "feature-add-adjust-frontend-environment-configuration-files-documentation-so-it-is-straightforward-to-publish-live-e-g-provide-a-live-env-configuration-alongside-the-existing-draft-env-configuration-without-requiring-code-changes",
+      "featureTitle": "Add/adjust frontend environment configuration files/documentation so it is straightforward to publish live (e.g., provide a live env configuration alongside the existing draft env configuration) without requiring code changes.",
       "files": [
-        "frontend/src/features/solitaire/SolitairePage.tsx",
-        "frontend/src/features/solitaire/components/CardView.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-remove-or-replace-any-transform-based-hover-active-visual-effects-on-cards-and-card-containers-that-could-trigger-unwanted-gpu-compositing-artifacts-while-preserving-clear-hover-pressed-affordances-using-non-transform-styling-e-g-ring-outline-brightness",
-      "featureTitle": "Remove or replace any transform-based hover/active visual effects on cards and card containers that could trigger unwanted GPU compositing artifacts, while preserving clear hover/pressed affordances using non-transform styling (e.g., ring/outline/brightness).",
-      "files": [
-        "frontend/src/features/solitaire/components/CardView.tsx",
-        "frontend/src/index.css"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-harden-global-css-defenses-specifically-for-the-card-element-and-its-wrappers-to-disable-reflection-causing-properties-e-g-webkit-box-reflect-filter-backdrop-filter-mix-blend-mode-3d-transform-settings-without-breaking-legitimate-styling-elsewhere",
-      "featureTitle": "Harden global CSS defenses specifically for the card element and its wrappers to disable reflection-causing properties (e.g., -webkit-box-reflect, filter/backdrop-filter, mix-blend-mode, 3D transform settings) without breaking legitimate styling elsewhere.",
-      "files": [
-        "frontend/src/features/solitaire/components/CardView.tsx",
-        "frontend/src/index.css"
+        "frontend/.env.draft",
+        "frontend/.env.live.example"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -55,26 +17,6 @@
       ],
       "testIds": [
         "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-verify-and-if-needed-adjust-the-tailwind-shadow-token-used-by-cards-shadow-card-so-it-uses-a-standard-subtle-box-shadow-that-does-not-trigger-reflection-like-artifacts-in-chromium-and-ensure-shadow-appearance-is-consistent-between-face-up-and-face-down-cards",
-      "featureTitle": "Verify and, if needed, adjust the Tailwind shadow token used by cards (shadow-card) so it uses a standard, subtle box-shadow that does not trigger reflection-like artifacts in Chromium, and ensure shadow appearance is consistent between face-up and face-down cards.",
-      "files": [
-        "frontend/src/features/solitaire/components/CardView.tsx",
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
       ],
       "confidence": "high"
     }

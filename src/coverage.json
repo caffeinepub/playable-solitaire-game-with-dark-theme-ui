@@ -1,70 +1,47 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T19:41:41.486Z",
+  "generatedAt": "2026-02-10T21:19:53.140Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 3,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Audit and update the solitaire card component styling so cards render without reflection/shine-like artifacts in Chromium browsers (Chrome/Edge) across all piles (stock/back-of-card, waste, foundation, tableau).",
-        "status": "implemented",
+        "summary": "Switch the frontend publishing configuration from Draft Mode to Live Mode for the production build by setting the publishing environment variable to live (VITE_PUBLISHING_STATE=live) and ensuring draft-only UI elements are not shown.",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/features/solitaire/components/CardView.tsx",
-          "frontend/src/features/solitaire/components/PileView.tsx",
-          "frontend/src/features/solitaire/SolitairePage.tsx"
+          "frontend/src/config/publishing.ts",
+          "frontend/src/App.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/features/solitaire/components/CardView.tsx",
-          "frontend/src/features/solitaire/SolitairePage.tsx"
-        ]
+        "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "Remove or replace any transform-based hover/active visual effects on cards and card containers that could trigger unwanted GPU compositing artifacts, while preserving clear hover/pressed affordances using non-transform styling (e.g., ring/outline/brightness).",
-        "status": "implemented",
+        "summary": "Ensure the robots meta policy behaves correctly in Live Mode so search engines can index the site: in live mode set robots to \"index, follow\"; in draft/maintenance set robots to \"noindex, nofollow\".",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/features/solitaire/components/CardView.tsx",
-          "frontend/src/features/solitaire/components/PileView.tsx",
-          "frontend/src/index.css"
+          "frontend/src/hooks/useRobotsPolicy.ts",
+          "frontend/index.html"
         ],
-        "matchedFiles": [
-          "frontend/src/features/solitaire/components/CardView.tsx",
-          "frontend/src/index.css"
-        ]
+        "matchedFiles": []
       },
       {
         "id": "REQ-3",
-        "summary": "Harden global CSS defenses specifically for the card element and its wrappers to disable reflection-causing properties (e.g., -webkit-box-reflect, filter/backdrop-filter, mix-blend-mode, 3D transform settings) without breaking legitimate styling elsewhere.",
+        "summary": "Add/adjust frontend environment configuration files/documentation so it is straightforward to publish live (e.g., provide a live env configuration alongside the existing draft env configuration) without requiring code changes.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/features/solitaire/components/PileView.tsx",
-          "frontend/src/features/solitaire/components/CardView.tsx"
+          "frontend/.env.live.example",
+          "frontend/README-publishing.md",
+          "frontend/.env.draft"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/features/solitaire/components/CardView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Verify and, if needed, adjust the Tailwind shadow token used by cards (shadow-card) so it uses a standard, subtle box-shadow that does not trigger reflection-like artifacts in Chromium, and ensure shadow appearance is consistent between face-up and face-down cards.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/tailwind.config.js",
-          "frontend/src/features/solitaire/components/CardView.tsx",
-          "frontend/src/index.css"
-        ],
-        "matchedFiles": [
-          "frontend/tailwind.config.js",
-          "frontend/src/features/solitaire/components/CardView.tsx",
-          "frontend/src/index.css"
+          "frontend/.env.live.example",
+          "frontend/.env.draft"
         ]
       }
     ]
@@ -74,10 +51,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/features/solitaire/SolitairePage.tsx",
-    "frontend/src/features/solitaire/components/CardView.tsx",
-    "frontend/src/index.css",
-    "frontend/tailwind.config.js",
+    "frontend/.env.draft",
+    "frontend/.env.live.example",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

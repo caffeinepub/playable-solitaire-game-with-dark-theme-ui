@@ -1,109 +1,72 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix Chromium reflective artifacts in solitaire card rendering",
+  "title": "Enable live-mode publishing configuration for production builds",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Audit and update solitaire card styling so cards render cleanly (no reflection/shine artifacts) across all piles in Chromium browsers.",
+      "summary": "Ensure production builds run in Live Mode when VITE_PUBLISHING_STATE=live and hide draft-only UI (Draft badge) in live mode without regressing draft behavior.",
       "acceptanceCriteria": [
-        "In Chrome and Edge, cards do not show any mirrored/reflection-like artifact beneath or around the card during idle, hover, drag, and drop states.",
-        "The fix applies consistently to face-up and face-down cards and to cards rendered in waste, foundation, and tableau piles.",
-        "Card visuals (border radius, border, suit colors, and general shadow presence) remain coherent and do not regress in Firefox/Safari."
+        "When built with VITE_PUBLISHING_STATE=live, the app runs in live mode (publishingState resolves to 'live').",
+        "The Draft indicator badge is not rendered anywhere in live mode.",
+        "When built with VITE_PUBLISHING_STATE=draft, the Draft indicator badge still appears (no regression to draft behavior)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/solitaire/components/CardView.tsx",
+          "path": "frontend/src/config/publishing.ts",
           "operation": "modify",
-          "description": "Adjust the card element’s styling to be Chromium-compositing-safe (e.g., ensure clipping/overflow behavior is explicit, keep effects to box-shadow/border/ring, and avoid any styling patterns known to cause reflective artifacts), while preserving current visuals for face-up/face-down cards."
+          "description": "Harden publishing state resolution to reliably map VITE_PUBLISHING_STATE to the expected union ('maintenance' | 'draft' | 'live'), keep the draft default, and ensure live builds resolve to 'live' when VITE_PUBLISHING_STATE=live."
         },
         {
-          "path": "frontend/src/features/solitaire/components/PileView.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Ensure every pile-rendered card has a consistent, explicit wrapper selector surface (existing data-card-wrapper and solitaire-card-wrapper) so defensive CSS applies uniformly across waste, foundation, tableau, and default pile render paths."
-        },
-        {
-          "path": "frontend/src/features/solitaire/SolitairePage.tsx",
-          "operation": "modify",
-          "description": "Apply the same card-wrapper selector(s) to the stock placeholder container (and any other card-like containers in this page) so the card/wrapper defensive CSS coverage includes the stock/back-of-card area as well."
+          "description": "Confirm draft-only UI is gated by publishingState === 'draft' so the DraftIndicator never renders in live mode while still rendering in draft mode; keep maintenance rendering behavior intact."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Remove/replace transform-based hover/active effects on cards and immediate wrappers, preserving non-transform hover/pressed affordances.",
+      "summary": "Set correct robots meta policy by publishing mode: live uses \"index, follow\"; draft/maintenance use \"noindex, nofollow\".",
       "acceptanceCriteria": [
-        "No card element or its immediate wrapper applies transform-based scaling/3D transforms for hover/active feedback.",
-        "Hover/active feedback remains visible and accessible (e.g., ring or outline) for clickable/draggable face-up cards.",
-        "Dragging a card does not introduce new shadows/reflections during the drag operation in Chrome/Edge."
+        "In live mode, the rendered <meta name=\"robots\"> content is \"index, follow\".",
+        "In draft mode, the rendered <meta name=\"robots\"> content is \"noindex, nofollow\".",
+        "In maintenance mode, the rendered <meta name=\"robots\"> content is \"noindex, nofollow\"."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/solitaire/components/CardView.tsx",
+          "path": "frontend/src/hooks/useRobotsPolicy.ts",
           "operation": "modify",
-          "description": "Audit and update card interaction classes to ensure hover/active affordances rely on non-transform styling only (ring/outline/brightness/box-shadow), and that no transform-based feedback is applied on the card root or its immediate wrapper."
+          "description": "Ensure the hook always sets the robots meta tag content to 'index, follow' only in live mode, and to 'noindex, nofollow' in draft and maintenance modes (including creating the tag if missing)."
         },
         {
-          "path": "frontend/src/features/solitaire/components/PileView.tsx",
+          "path": "frontend/index.html",
           "operation": "modify",
-          "description": "Audit pile wrappers to ensure they do not apply transform-based hover/active feedback (including any implicit transform utilities) and that drag-over/selection affordances remain non-transform (e.g., ring/border/background changes)."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add narrowly-scoped CSS guardrails for the card root and immediate wrapper selectors to prevent transform-based hover/active feedback (including 3D transform settings) from being applied, while keeping feedback visible via non-transform styles already used by the components."
+          "description": "Keep a safe default robots meta tag for non-live builds (e.g., defaulting to 'noindex, nofollow') and align comments/intent with runtime control from useRobotsPolicy."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Harden global CSS defenses for card elements and wrappers to neutralize reflection/compositing-prone properties without impacting the rest of the UI.",
+      "summary": "Add straightforward live-mode env configuration and/or documentation so publishing live does not require code changes, while preserving the existing draft configuration.",
       "acceptanceCriteria": [
-        "Global CSS rules explicitly neutralize reflection- and compositing-prone properties for the card element selector(s) and the card wrapper selector(s).",
-        "Defensive CSS targets the actual card elements and wrappers used by the solitaire UI (including data attributes and existing utility classes).",
-        "No new visual regressions appear in non-card UI elements (dialogs, buttons, header) due to overly broad CSS selectors."
+        "Repository includes a clearly named live-mode env example/config (or updated publishing README instructions) that specifies VITE_PUBLISHING_STATE=live.",
+        "The existing draft env configuration remains available and unchanged for draft deployments."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Refine and extend card-specific defensive CSS for .solitaire-card / [data-card=\"true\"] and .solitaire-card-wrapper / [data-card-wrapper] to explicitly neutralize reflection/compositing-prone properties (e.g., -webkit-box-reflect, filter/backdrop-filter, mix-blend-mode, perspective/transform-style/backface-visibility) while keeping selectors tightly scoped to solitaire card surfaces only."
+          "path": "frontend/.env.live.example",
+          "operation": "create",
+          "description": "Add a clearly named live-mode env example that sets VITE_PUBLISHING_STATE=live and documents any relevant optional flags for production builds, without changing existing draft env files."
         },
         {
-          "path": "frontend/src/features/solitaire/components/PileView.tsx",
+          "path": "frontend/README-publishing.md",
           "operation": "modify",
-          "description": "Confirm the actual wrappers used for all pile types include the intended attributes/classes so the global defensive CSS targets the real DOM structure (including tableau absolute-position wrappers and foundation/waste wrappers)."
+          "description": "Update publishing instructions to reference the new live-mode env example and clearly describe how to run in live vs draft vs maintenance via environment variables (no code changes required)."
         },
         {
-          "path": "frontend/src/features/solitaire/components/CardView.tsx",
+          "path": "frontend/.env.draft",
           "operation": "modify",
-          "description": "Ensure the rendered card root retains the canonical selectors (solitaire-card and data-card=\"true\") so global defensive CSS reliably applies to all card instances, including during dragging."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Verify and adjust the Tailwind shadow token used by cards (shadow-card) to a safe, subtle box-shadow consistent across face-up and face-down cards.",
-      "acceptanceCriteria": [
-        "The card shadow uses a conventional box-shadow (no filters) and renders consistently in Chrome/Edge without reflective artifacts.",
-        "Face-up and face-down cards both use the same safe shadow approach (or a deliberately chosen, safe variant) with consistent visual weight.",
-        "Any Tailwind theme/shadow changes do not break other components that rely on existing shadow tokens."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Update the shadow-card Tailwind token to a conventional, subtle box-shadow value designed to avoid Chromium reflection-like artifacts (no filter-based shadows), keeping the token name stable to avoid breaking other usages."
-        },
-        {
-          "path": "frontend/src/features/solitaire/components/CardView.tsx",
-          "operation": "modify",
-          "description": "Verify both face-up and face-down card variants use the same shadow-card token (or an explicitly chosen safe variant) and do not introduce additional shadow/filter effects during hover/active/drag states."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add/adjust any card-scoped CSS overrides needed to ensure the card shadow remains a standard box-shadow presentation in Chromium (e.g., explicitly neutralize filter/backdrop-filter on card surfaces so the Tailwind shadow token is not visually altered)."
+          "description": "Add a brief comment pointing readers to the live-mode env example (without changing existing values) to preserve draft deployments and make switching modes straightforward."
         }
       ]
     }

@@ -127,7 +127,7 @@
         transform: none !important;
     }
     
-    /* Target card wrapper elements */
+    /* Target card wrapper elements - now includes overflow clipping */
     .solitaire-card-wrapper,
     [data-card-wrapper] {
         -webkit-box-reflect: none !important;
@@ -141,6 +141,8 @@
         isolation: auto !important;
         /* Prevent transform-based effects on wrappers */
         transform: none !important;
+        /* Clip overflow to prevent content bleed */
+        overflow: hidden !important;
     }
     
     /* Explicitly prevent hover/active transforms on cards */
@@ -157,5 +159,21 @@
     [data-card-wrapper]:hover,
     [data-card-wrapper]:active {
         transform: none !important;
+    }
+    
+    /* Background-image rendering mode: explicitly disable all compositing effects */
+    .card-background-layer {
+        -webkit-box-reflect: none !important;
+        transform-style: flat !important;
+        backface-visibility: hidden !important;
+        perspective: none !important;
+        filter: none !important;
+        backdrop-filter: none !important;
+        mix-blend-mode: normal !important;
+        will-change: auto !important;
+        isolation: auto !important;
+        transform: none !important;
+        /* Ensure pointer events are disabled */
+        pointer-events: none !important;
     }
 }

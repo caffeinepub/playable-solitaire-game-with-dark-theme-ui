@@ -1,5 +1,8 @@
 import React from 'react';
 import { Card } from '../solitaireTypes';
+import { disableAdvancedShading } from '../../../config/visualEffects';
+import { useBackgroundImageRendering, useImgRendering } from '../../../config/cardRenderMode';
+import { getCardBackgroundImage, getCardImageSrc } from './cardBackgroundImages';
 
 interface CardViewProps {
   card: Card;
@@ -40,15 +43,85 @@ export default function CardView({
     }
   };
 
+  // <img> rendering mode
+  if (useImgRendering) {
+    return (
+      <div
+        data-card="true"
+        className={`
+          solitaire-card
+          relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 overflow-hidden
+          ${card.faceUp 
+            ? `bg-card-surface border-card-border ${disableAdvancedShading ? '' : 'shadow-card'}` 
+            : `bg-card-back border-card-back-border ${disableAdvancedShading ? '' : 'shadow-card'}`
+          }
+          ${isSelected ? 'ring-4 ring-amber-400 ring-offset-0' : ''}
+          ${isHinted ? 'ring-4 ring-green-400 ring-offset-0 animate-pulse' : ''}
+          ${onClick && card.faceUp ? 'cursor-pointer hover:ring-2 hover:ring-amber-300 active:ring-4 active:ring-amber-500' : ''}
+          ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''}
+        `}
+        onClick={handleClick}
+        draggable={isDraggable}
+        onDragStart={handleDragStart}
+        onDragEnd={onDragEnd}
+      >
+        {/* Image element - absolutely positioned, pointer-events-none to allow container interactions */}
+        <img 
+          src={getCardImageSrc(card)}
+          alt={card.faceUp ? `${card.rank} of ${card.suit}` : 'Card back'}
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none rounded-lg"
+          draggable={false}
+        />
+      </div>
+    );
+  }
+
+  // Background-image rendering mode
+  if (useBackgroundImageRendering) {
+    return (
+      <div
+        data-card="true"
+        className={`
+          solitaire-card
+          relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 overflow-hidden
+          ${card.faceUp 
+            ? `bg-card-surface border-card-border ${disableAdvancedShading ? '' : 'shadow-card'}` 
+            : `bg-card-back border-card-back-border ${disableAdvancedShading ? '' : 'shadow-card'}`
+          }
+          ${isSelected ? 'ring-4 ring-amber-400 ring-offset-0' : ''}
+          ${isHinted ? 'ring-4 ring-green-400 ring-offset-0 animate-pulse' : ''}
+          ${onClick && card.faceUp ? 'cursor-pointer hover:ring-2 hover:ring-amber-300 active:ring-4 active:ring-amber-500' : ''}
+          ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''}
+        `}
+        onClick={handleClick}
+        draggable={isDraggable}
+        onDragStart={handleDragStart}
+        onDragEnd={onDragEnd}
+      >
+        {/* Background-image layer - absolutely positioned, no filters/transforms */}
+        <div 
+          className="card-background-layer absolute inset-0 rounded-lg pointer-events-none"
+          style={{
+            backgroundImage: getCardBackgroundImage(card),
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Default DOM rendering mode
   return (
     <div
       data-card="true"
       className={`
         solitaire-card
-        relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 
+        relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 overflow-hidden
         ${card.faceUp 
-          ? 'bg-card-surface border-card-border shadow-card' 
-          : 'bg-card-back border-card-back-border shadow-card'
+          ? `bg-card-surface border-card-border ${disableAdvancedShading ? '' : 'shadow-card'}` 
+          : `bg-card-back border-card-back-border ${disableAdvancedShading ? '' : 'shadow-card'}`
         }
         ${isSelected ? 'ring-4 ring-amber-400 ring-offset-0' : ''}
         ${isHinted ? 'ring-4 ring-green-400 ring-offset-0 animate-pulse' : ''}
