@@ -237,7 +237,7 @@ export default function SolitairePage() {
       <header className="border-b border-border/40 bg-card/20">
         <div className="container mx-auto px-4 py-4 relative">
           <h1 className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 bg-clip-text text-transparent">
-            Relax & Enjoy
+            Simple Solitaire
           </h1>
           {/* Timer and Moves in upper right corner (desktop) */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-4">
@@ -270,7 +270,7 @@ export default function SolitairePage() {
         {/* Game board */}
         <div className="space-y-8 sm:space-y-12">
           {/* Top row: Stock, Waste, and Foundations */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center sm:justify-start">
+          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
             {/* Stock pile */}
             <div
               data-card-wrapper="stock"
@@ -327,7 +327,7 @@ export default function SolitairePage() {
           </div>
 
           {/* Tableau piles */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center sm:justify-start">
+          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
             {gameState.tableau.map((pile, index) => (
               <PileView
                 key={index}

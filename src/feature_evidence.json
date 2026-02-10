@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-adjust-frontend-environment-configuration-files-documentation-so-it-is-straightforward-to-publish-live-e-g-provide-a-live-env-configuration-alongside-the-existing-draft-env-configuration-without-requiring-code-changes",
-      "featureTitle": "Add/adjust frontend environment configuration files/documentation so it is straightforward to publish live (e.g., provide a live env configuration alongside the existing draft env configuration) without requiring code changes.",
+      "featureId": "feature-update-the-top-header-title-on-the-solitaire-page-to-read-exactly-simple-solitaire-and-leave-all-other-existing-text-unchanged",
+      "featureTitle": "Update the top header title on the Solitaire page to read exactly \"Simple Solitaire\" and leave all other existing text unchanged.",
       "files": [
-        "frontend/.env.draft",
-        "frontend/.env.live.example"
+        "frontend/src/features/solitaire/SolitairePage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -16,7 +15,25 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-3"
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-center-the-card-layout-top-row-stock-waste-foundations-and-tableau-row-horizontally-within-the-page-across-responsive-breakpoints-without-breaking-drag-and-drop-interactions-or-causing-horizontal-overflow-on-typical-viewport-widths",
+      "featureTitle": "Center the card layout (top row: stock/waste/foundations; and tableau row) horizontally within the page across responsive breakpoints, without breaking drag-and-drop interactions or causing horizontal overflow on typical viewport widths.",
+      "files": [
+        "frontend/src/features/solitaire/SolitairePage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
       ],
       "confidence": "high"
     }

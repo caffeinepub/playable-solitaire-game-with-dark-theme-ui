@@ -1,18 +1,24 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project moving from draft/staging state toward publishing live.",
-  "architectural_notes": [
-    "Define/execute a production publish process (build + deploy to live)."
-  ],
+  "summary": "Simple Solitaire web page/app with centered card layout",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-adjust-frontend-environment-configuration-files-documentation-so-it-is-straightforward-to-publish-live-e-g-provide-a-live-env-configuration-alongside-the-existing-draft-env-configuration-without-requiring-code-changes",
-      "title": "Add/adjust frontend environment configuration files/documentation so it is straightforward to publish live (e.g., provide a live env configuration alongside the existing draft env configuration) without requiring code changes.",
+      "id": "feature-update-the-top-header-title-on-the-solitaire-page-to-read-exactly-simple-solitaire-and-leave-all-other-existing-text-unchanged",
+      "title": "Update the top header title on the Solitaire page to read exactly \"Simple Solitaire\" and leave all other existing text unchanged.",
       "reqIds": [
-        "REQ-3"
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-center-the-card-layout-top-row-stock-waste-foundations-and-tableau-row-horizontally-within-the-page-across-responsive-breakpoints-without-breaking-drag-and-drop-interactions-or-causing-horizontal-overflow-on-typical-viewport-widths",
+      "title": "Center the card layout (top row: stock/waste/foundations; and tableau row) horizontally within the page across responsive breakpoints, without breaking drag-and-drop interactions or causing horizontal overflow on typical viewport widths.",
+      "reqIds": [
+        "REQ-2"
       ],
       "version": 1
     }
@@ -20,28 +26,18 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Publish the current build live (production release)",
+      "summary": "Update the top title text to read \"Simple Solitaire\" while keeping all other text unchanged",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Switch the frontend publishing configuration from Draft Mode to Live Mode for the production build by setting the publishing environment variable to live (VITE_PUBLISHING_STATE=live) and ensuring draft-only UI elements are not shown.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Ensure the robots meta policy behaves correctly in Live Mode so search engines can index the site: in live mode set robots to \"index, follow\"; in draft/maintenance set robots to \"noindex, nofollow\".",
-      "reqIds": [
-        "REQ-2"
-      ],
+      "summary": "Center the cards on the web page without causing layout/responsiveness issues",
+      "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Publish the app in live mode (production)",
+  "projectName": "Simple Solitaire",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

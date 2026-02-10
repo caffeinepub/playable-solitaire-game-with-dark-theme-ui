@@ -1,84 +1,54 @@
 {
   "kind": "build_request",
-  "title": "Publish the app in live mode (production)",
+  "title": "Rename header title to “Simple Solitaire” and center card layout",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Switch the frontend publishing configuration from Draft Mode to Live Mode for the production build by setting the publishing environment variable to live (VITE_PUBLISHING_STATE=live) and ensuring draft-only UI elements are not shown.",
+      "text": "Update the top header title on the Solitaire page to read exactly \"Simple Solitaire\" and leave all other existing text unchanged.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "This looks great, just as envisioned! Let's publish live"
+          "I would like the Top title to read as Simple Solitaire, all other text to remain the same."
         ]
       },
       "acceptanceCriteria": [
-        "When built with VITE_PUBLISHING_STATE=live, the app runs in live mode (publishingState resolves to 'live').",
-        "The Draft indicator badge is not rendered anywhere in live mode.",
-        "When built with VITE_PUBLISHING_STATE=draft, the Draft indicator badge still appears (no regression to draft behavior)."
+        "On the main Solitaire page header, the large centered title text displays \"Simple Solitaire\".",
+        "No other user-facing text strings are changed (e.g., footer text, empty pile placeholders, button labels, dialogs)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Ensure the robots meta policy behaves correctly in Live Mode so search engines can index the site: in live mode set robots to \"index, follow\"; in draft/maintenance set robots to \"noindex, nofollow\".",
+      "text": "Center the card layout (top row: stock/waste/foundations; and tableau row) horizontally within the page across responsive breakpoints, without breaking drag-and-drop interactions or causing horizontal overflow on typical viewport widths.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "Let's publish live"
+          "Regarding format, can the cards be centered in the web page without causing issues?"
         ]
       },
       "acceptanceCriteria": [
-        "In live mode, the rendered <meta name=\"robots\"> content is \"index, follow\".",
-        "In draft mode, the rendered <meta name=\"robots\"> content is \"noindex, nofollow\".",
-        "In maintenance mode, the rendered <meta name=\"robots\"> content is \"noindex, nofollow\"."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Add/adjust frontend environment configuration files/documentation so it is straightforward to publish live (e.g., provide a live env configuration alongside the existing draft env configuration) without requiring code changes.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "Let's publish live"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Repository includes a clearly named live-mode env example/config (or updated publishing README instructions) that specifies VITE_PUBLISHING_STATE=live.",
-        "The existing draft env configuration remains available and unchanged for draft deployments."
+        "On desktop and mobile widths, the top row of piles and the tableau piles are visually centered within the main content area (not left-aligned on larger screens).",
+        "Drag-and-drop still functions correctly for tableau and foundation drop targets after the layout change.",
+        "The layout remains responsive: piles can wrap to new lines as needed and no new persistent horizontal scrollbar is introduced on common screen sizes."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/components/ui (read-only).",
-    "Do not modify immutable hook files (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
-    "Keep backend as a single Motoko actor; no new backend services or external databases."
+    "Do not modify files under frontend/src/components/ui or any paths listed as immutable in SYSTEM_CONTEXT.",
+    "Keep the application backend unchanged (no Motoko changes required)."
   ],
   "nonGoals": [
-    "Adding new gameplay features or changing Solitaire rules.",
-    "Implementing new authentication providers beyond Internet Identity.",
-    "Introducing real-time features (WebSockets/chat) or external integrations."
+    "Do not change any other copy besides the top header title text.",
+    "Do not redesign the game, add new controls, or change game rules/logic."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

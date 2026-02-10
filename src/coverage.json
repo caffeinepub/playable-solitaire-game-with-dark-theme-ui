@@ -1,47 +1,35 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T21:19:53.140Z",
+  "generatedAt": "2026-02-10T21:32:22.314Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 1,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Switch the frontend publishing configuration from Draft Mode to Live Mode for the production build by setting the publishing environment variable to live (VITE_PUBLISHING_STATE=live) and ensuring draft-only UI elements are not shown.",
-        "status": "missing",
+        "summary": "Update the top header title on the Solitaire page to read exactly \"Simple Solitaire\" and leave all other existing text unchanged.",
+        "status": "implemented",
         "plannedFiles": [
-          "frontend/src/config/publishing.ts",
-          "frontend/src/App.tsx"
+          "frontend/src/features/solitaire/SolitairePage.tsx"
         ],
-        "matchedFiles": []
+        "matchedFiles": [
+          "frontend/src/features/solitaire/SolitairePage.tsx"
+        ]
       },
       {
         "id": "REQ-2",
-        "summary": "Ensure the robots meta policy behaves correctly in Live Mode so search engines can index the site: in live mode set robots to \"index, follow\"; in draft/maintenance set robots to \"noindex, nofollow\".",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/hooks/useRobotsPolicy.ts",
-          "frontend/index.html"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Add/adjust frontend environment configuration files/documentation so it is straightforward to publish live (e.g., provide a live env configuration alongside the existing draft env configuration) without requiring code changes.",
+        "summary": "Center the card layout (top row: stock/waste/foundations; and tableau row) horizontally within the page across responsive breakpoints, without breaking drag-and-drop interactions or causing horizontal overflow on typical viewport widths.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/.env.live.example",
-          "frontend/README-publishing.md",
-          "frontend/.env.draft"
+          "frontend/src/features/solitaire/SolitairePage.tsx"
         ],
         "matchedFiles": [
-          "frontend/.env.live.example",
-          "frontend/.env.draft"
+          "frontend/src/features/solitaire/SolitairePage.tsx"
         ]
       }
     ]
@@ -51,8 +39,7 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/.env.draft",
-    "frontend/.env.live.example",
+    "frontend/src/features/solitaire/SolitairePage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,72 +1,36 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Enable live-mode publishing configuration for production builds",
+  "title": "Simple Solitaire header rename and centered board layout",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Ensure production builds run in Live Mode when VITE_PUBLISHING_STATE=live and hide draft-only UI (Draft badge) in live mode without regressing draft behavior.",
+      "summary": "Rename the Solitaire page header title text to exactly \"Simple Solitaire\" without changing any other user-facing copy.",
       "acceptanceCriteria": [
-        "When built with VITE_PUBLISHING_STATE=live, the app runs in live mode (publishingState resolves to 'live').",
-        "The Draft indicator badge is not rendered anywhere in live mode.",
-        "When built with VITE_PUBLISHING_STATE=draft, the Draft indicator badge still appears (no regression to draft behavior)."
+        "On the main Solitaire page header, the large centered title text displays \"Simple Solitaire\".",
+        "No other user-facing text strings are changed (e.g., footer text, empty pile placeholders, button labels, dialogs)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/config/publishing.ts",
+          "path": "frontend/src/features/solitaire/SolitairePage.tsx",
           "operation": "modify",
-          "description": "Harden publishing state resolution to reliably map VITE_PUBLISHING_STATE to the expected union ('maintenance' | 'draft' | 'live'), keep the draft default, and ensure live builds resolve to 'live' when VITE_PUBLISHING_STATE=live."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Confirm draft-only UI is gated by publishingState === 'draft' so the DraftIndicator never renders in live mode while still rendering in draft mode; keep maintenance rendering behavior intact."
+          "description": "Update the header <h1> text content from the current string to exactly \"Simple Solitaire\" while leaving all other strings and UI content unchanged."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Set correct robots meta policy by publishing mode: live uses \"index, follow\"; draft/maintenance use \"noindex, nofollow\".",
+      "summary": "Center the top-row piles and tableau piles horizontally across breakpoints while preserving responsive wrapping and drag-and-drop behavior.",
       "acceptanceCriteria": [
-        "In live mode, the rendered <meta name=\"robots\"> content is \"index, follow\".",
-        "In draft mode, the rendered <meta name=\"robots\"> content is \"noindex, nofollow\".",
-        "In maintenance mode, the rendered <meta name=\"robots\"> content is \"noindex, nofollow\"."
+        "On desktop and mobile widths, the top row of piles and the tableau piles are visually centered within the main content area (not left-aligned on larger screens).",
+        "Drag-and-drop still functions correctly for tableau and foundation drop targets after the layout change.",
+        "The layout remains responsive: piles can wrap to new lines as needed and no new persistent horizontal scrollbar is introduced on common screen sizes."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useRobotsPolicy.ts",
+          "path": "frontend/src/features/solitaire/SolitairePage.tsx",
           "operation": "modify",
-          "description": "Ensure the hook always sets the robots meta tag content to 'index, follow' only in live mode, and to 'noindex, nofollow' in draft and maintenance modes (including creating the tag if missing)."
-        },
-        {
-          "path": "frontend/index.html",
-          "operation": "modify",
-          "description": "Keep a safe default robots meta tag for non-live builds (e.g., defaulting to 'noindex, nofollow') and align comments/intent with runtime control from useRobotsPolicy."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Add straightforward live-mode env configuration and/or documentation so publishing live does not require code changes, while preserving the existing draft configuration.",
-      "acceptanceCriteria": [
-        "Repository includes a clearly named live-mode env example/config (or updated publishing README instructions) that specifies VITE_PUBLISHING_STATE=live.",
-        "The existing draft env configuration remains available and unchanged for draft deployments."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/.env.live.example",
-          "operation": "create",
-          "description": "Add a clearly named live-mode env example that sets VITE_PUBLISHING_STATE=live and documents any relevant optional flags for production builds, without changing existing draft env files."
-        },
-        {
-          "path": "frontend/README-publishing.md",
-          "operation": "modify",
-          "description": "Update publishing instructions to reference the new live-mode env example and clearly describe how to run in live vs draft vs maintenance via environment variables (no code changes required)."
-        },
-        {
-          "path": "frontend/.env.draft",
-          "operation": "modify",
-          "description": "Add a brief comment pointing readers to the live-mode env example (without changing existing values) to preserve draft deployments and make switching modes straightforward."
+          "description": "Adjust the Tailwind layout classes for the top-row and tableau flex containers to be centered at all responsive breakpoints (remove the larger-screen left alignment), while keeping flex-wrap enabled to prevent horizontal overflow and ensuring existing drag-and-drop handlers continue to receive events."
         }
       ]
     }
