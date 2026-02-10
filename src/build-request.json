@@ -1,75 +1,103 @@
 {
   "kind": "build_request",
-  "title": "Remove foundation lock so suit spaces are fully interactive",
+  "title": "Inspect and fix solitaire card styles causing reflective artifacts in Chromium",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-43",
-      "text": "Remove the foundation (suit space) \"locked\" behavior so foundation piles can be used as move sources again (via click-to-select and drag-and-drop), while still enforcing existing Klondike move rules.",
+      "id": "REQ-1",
+      "text": "Audit and update the solitaire card component styling so cards render without reflection/shine-like artifacts in Chromium browsers (Chrome/Edge) across all piles (stock/back-of-card, waste, foundation, tableau).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-7"
         ],
         "quotes": [
-          "Let's remove the LOCK feature from the suit spaces"
+          "inspect the card styles"
         ]
       },
       "acceptanceCriteria": [
-        "A player can click the top card in a foundation pile to select it, and then click a tableau pile to attempt a move; the move succeeds only when rules allow and otherwise leaves state unchanged.",
-        "A player can drag the top card from a foundation pile and drop it onto a tableau pile; the move succeeds only when rules allow and otherwise leaves state unchanged (no stranded/missing cards).",
-        "Dragging from foundations is no longer blocked in drag payload validation/serialization, and drops originating from foundations are handled normally.",
-        "Existing restrictions remain in place: only the top foundation card can move; no multi-card moves from foundations; all move legality is still enforced by the current Klondike rules."
+        "In Chrome and Edge, cards do not show any mirrored/reflection-like artifact beneath or around the card during idle, hover, drag, and drop states.",
+        "The fix applies consistently to face-up and face-down cards and to cards rendered in waste, foundation, and tableau piles.",
+        "Card visuals (border radius, border, suit colors, and general shadow presence) remain coherent and do not regress in Firefox/Safari."
       ]
     },
     {
-      "id": "REQ-44",
-      "text": "Remove the visual lock affordance and disabled styling from foundation top cards, so foundation cards look and behave like normal interactive cards when they are draggable/selectable.",
+      "id": "REQ-2",
+      "text": "Remove or replace any transform-based hover/active visual effects on cards and card containers that could trigger unwanted GPU compositing artifacts, while preserving clear hover/pressed affordances using non-transform styling (e.g., ring/outline/brightness).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-7"
         ],
         "quotes": [
-          "Let's remove the LOCK feature from the suit spaces"
+          "inspect the card styles"
         ]
       },
       "acceptanceCriteria": [
-        "The lock icon overlay is no longer rendered on foundation cards.",
-        "Foundation cards no longer show a locked/disabled cursor (e.g., no cursor-not-allowed) and do not appear visually \"locked\" (e.g., no forced opacity changes for lock state).",
-        "Foundation top cards regain normal hover/active styling consistent with other interactive cards (while still respecting any existing selection/hint styling)."
+        "No card element or its immediate wrapper applies transform-based scaling/3D transforms for hover/active feedback.",
+        "Hover/active feedback remains visible and accessible (e.g., ring or outline) for clickable/draggable face-up cards.",
+        "Dragging a card does not introduce new shadows/reflections during the drag operation in Chrome/Edge."
       ]
     },
     {
-      "id": "REQ-45",
-      "text": "Update the Hint behavior to include legal moves FROM foundation piles (e.g., foundation top card to a valid tableau pile), since foundations are no longer locked.",
+      "id": "REQ-3",
+      "text": "Harden global CSS defenses specifically for the card element and its wrappers to disable reflection-causing properties (e.g., -webkit-box-reflect, filter/backdrop-filter, mix-blend-mode, 3D transform settings) without breaking legitimate styling elsewhere.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-7"
         ],
         "quotes": [
-          "Let's remove the LOCK feature from the suit spaces"
+          "inspect the card styles"
         ]
       },
       "acceptanceCriteria": [
-        "When at least one legal move exists from a foundation top card to a tableau pile, the Hint system can return and highlight such a move.",
-        "Hint behavior for waste-to-foundation, waste-to-tableau, tableau-to-foundation, and tableau-to-tableau remains functional and unchanged in intent."
+        "Global CSS rules explicitly neutralize reflection- and compositing-prone properties for the card element selector(s) and the card wrapper selector(s).",
+        "Defensive CSS targets the actual card elements and wrappers used by the solitaire UI (including data attributes and existing utility classes).",
+        "No new visual regressions appear in non-card UI elements (dialogs, buttons, header) due to overly broad CSS selectors."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Verify and, if needed, adjust the Tailwind shadow token used by cards (shadow-card) so it uses a standard, subtle box-shadow that does not trigger reflection-like artifacts in Chromium, and ensure shadow appearance is consistent between face-up and face-down cards.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-7"
+        ],
+        "quotes": [
+          "inspect the card styles"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The card shadow uses a conventional box-shadow (no filters) and renders consistently in Chrome/Edge without reflective artifacts.",
+        "Face-up and face-down cards both use the same safe shadow approach (or a deliberately chosen, safe variant) with consistent visual weight.",
+        "Any Tailwind theme/shadow changes do not break other components that rely on existing shadow tokens."
       ]
     }
   ],
   "constraints": [
-    "Do not edit any files under frontend/src/components/ui (read-only UI components must be composed, not modified).",
-    "Do not modify the immutable hook files listed in SYSTEM_CONTEXT (frontend/src/hooks/useInternetIdentity.ts/tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
-    "Keep backend as a single Motoko actor; no backend changes are required for this request."
+    "Frontend immutable paths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui) must not be edited.",
+    "Backend must remain single-actor; no new backend services.",
+    "Do not introduce WebSockets/real-time messaging, third-party auth providers, or external databases."
   ],
   "nonGoals": [
-    "Do not change Klondike legality rules (only remove the foundation lock restriction).",
-    "Do not add new scoring, timer, or leaderboard features.",
-    "Do not redesign the overall visual theme beyond removing lock-specific visuals on foundation cards."
+    "Adding new gameplay features or changing solitaire rules.",
+    "Implementing backend persistence for game state or scores (current localStorage approach is out of scope unless required for styling fixes).",
+    "Redesigning the overall page theme beyond what is necessary to resolve the reflective artifact and keep card visuals consistent."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

@@ -1,78 +1,109 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Make foundation piles interactive again (remove lock) with rules preserved",
+  "title": "Fix Chromium reflective artifacts in solitaire card rendering",
   "requirements": [
     {
-      "id": "REQ-43",
-      "summary": "Allow selecting and dragging the top foundation card as a move source while preserving existing Klondike legality checks",
+      "id": "REQ-1",
+      "summary": "Audit and update solitaire card styling so cards render cleanly (no reflection/shine artifacts) across all piles in Chromium browsers.",
       "acceptanceCriteria": [
-        "A player can click the top card in a foundation pile to select it, and then click a tableau pile to attempt a move; the move succeeds only when rules allow and otherwise leaves state unchanged.",
-        "A player can drag the top card from a foundation pile and drop it onto a tableau pile; the move succeeds only when rules allow and otherwise leaves state unchanged (no stranded/missing cards).",
-        "Dragging from foundations is no longer blocked in drag payload validation/serialization, and drops originating from foundations are handled normally.",
-        "Existing restrictions remain in place: only the top foundation card can move; no multi-card moves from foundations; all move legality is still enforced by the current Klondike rules."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/features/solitaire/solitaireDrag.ts",
-          "operation": "modify",
-          "description": "Remove the explicit rejection of drag payloads originating from foundations in payload deserialization and drag-source validation so foundation sources can be serialized/validated like waste/tableau."
-        },
-        {
-          "path": "frontend/src/features/solitaire/SolitairePage.tsx",
-          "operation": "modify",
-          "description": "Enable foundation top-card selection in click-to-select flow, enable foundation top-card dragging in drag-start logic and draggable predicate, and remove foundation-source rejection in drag/drop handlers while keeping move attempts routed through existing move legality enforcement."
-        },
-        {
-          "path": "frontend/src/features/solitaire/components/PileView.tsx",
-          "operation": "modify",
-          "description": "Make foundation pile rendering use the same interactive wiring as other piles: pass through onCardClick for the top card, and allow draggable/onDragStart/onDragEnd for the top card when the parent marks it draggable (still only top card is rendered, so multi-card foundation drags are impossible)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-44",
-      "summary": "Remove lock icon and locked/disabled styling from foundation top cards so they look and behave like normal interactive cards",
-      "acceptanceCriteria": [
-        "The lock icon overlay is no longer rendered on foundation cards.",
-        "Foundation cards no longer show a locked/disabled cursor (e.g., no cursor-not-allowed) and do not appear visually \"locked\" (e.g., no forced opacity changes for lock state).",
-        "Foundation top cards regain normal hover/active styling consistent with other interactive cards (while still respecting any existing selection/hint styling)."
+        "In Chrome and Edge, cards do not show any mirrored/reflection-like artifact beneath or around the card during idle, hover, drag, and drop states.",
+        "The fix applies consistently to face-up and face-down cards and to cards rendered in waste, foundation, and tableau piles.",
+        "Card visuals (border radius, border, suit colors, and general shadow presence) remain coherent and do not regress in Firefox/Safari."
       ],
       "file_operations": [
         {
           "path": "frontend/src/features/solitaire/components/CardView.tsx",
           "operation": "modify",
-          "description": "Remove the lock affordance (icon overlay) and the locked-only disabled styling/behavior gates so the component renders foundation cards with the same interactive styling rules as other draggable/selectable cards."
+          "description": "Adjust the card element’s styling to be Chromium-compositing-safe (e.g., ensure clipping/overflow behavior is explicit, keep effects to box-shadow/border/ring, and avoid any styling patterns known to cause reflective artifacts), while preserving current visuals for face-up/face-down cards."
         },
         {
           "path": "frontend/src/features/solitaire/components/PileView.tsx",
           "operation": "modify",
-          "description": "Remove/stop using the foundation-lock plumbing (e.g., isFoundationLocked -> CardView isLocked) so foundation top cards no longer receive forced locked styling and instead rely on normal draggable/selectable props."
+          "description": "Ensure every pile-rendered card has a consistent, explicit wrapper selector surface (existing data-card-wrapper and solitaire-card-wrapper) so defensive CSS applies uniformly across waste, foundation, tableau, and default pile render paths."
         },
         {
           "path": "frontend/src/features/solitaire/SolitairePage.tsx",
           "operation": "modify",
-          "description": "Stop passing locked/disabled flags to foundation piles/cards and ensure foundation top cards receive the same click/drag wiring as other interactive cards (selection and hint visuals should remain intact)."
+          "description": "Apply the same card-wrapper selector(s) to the stock placeholder container (and any other card-like containers in this page) so the card/wrapper defensive CSS coverage includes the stock/back-of-card area as well."
         }
       ]
     },
     {
-      "id": "REQ-45",
-      "summary": "Extend Hint generation to include legal moves from foundation top cards to tableau piles",
+      "id": "REQ-2",
+      "summary": "Remove/replace transform-based hover/active effects on cards and immediate wrappers, preserving non-transform hover/pressed affordances.",
       "acceptanceCriteria": [
-        "When at least one legal move exists from a foundation top card to a tableau pile, the Hint system can return and highlight such a move.",
-        "Hint behavior for waste-to-foundation, waste-to-tableau, tableau-to-foundation, and tableau-to-tableau remains functional and unchanged in intent."
+        "No card element or its immediate wrapper applies transform-based scaling/3D transforms for hover/active feedback.",
+        "Hover/active feedback remains visible and accessible (e.g., ring or outline) for clickable/draggable face-up cards.",
+        "Dragging a card does not introduce new shadows/reflections during the drag operation in Chrome/Edge."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/solitaire/solitaireHint.ts",
+          "path": "frontend/src/features/solitaire/components/CardView.tsx",
           "operation": "modify",
-          "description": "Remove the foundation-lock assumption and add a scan for foundation->tableau moves (top card only) using existing tableau placement rules, returning the first such legal move without changing the existing hint priority for other move types."
+          "description": "Audit and update card interaction classes to ensure hover/active affordances rely on non-transform styling only (ring/outline/brightness/box-shadow), and that no transform-based feedback is applied on the card root or its immediate wrapper."
         },
         {
-          "path": "frontend/src/features/solitaire/SolitairePage.tsx",
+          "path": "frontend/src/features/solitaire/components/PileView.tsx",
           "operation": "modify",
-          "description": "Ensure hint highlighting logic correctly supports hints whose source is a foundation pile (highlight the foundation top card as the hinted 'from' selection) while keeping existing hint highlighting behavior unchanged for other move types."
+          "description": "Audit pile wrappers to ensure they do not apply transform-based hover/active feedback (including any implicit transform utilities) and that drag-over/selection affordances remain non-transform (e.g., ring/border/background changes)."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add narrowly-scoped CSS guardrails for the card root and immediate wrapper selectors to prevent transform-based hover/active feedback (including 3D transform settings) from being applied, while keeping feedback visible via non-transform styles already used by the components."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Harden global CSS defenses for card elements and wrappers to neutralize reflection/compositing-prone properties without impacting the rest of the UI.",
+      "acceptanceCriteria": [
+        "Global CSS rules explicitly neutralize reflection- and compositing-prone properties for the card element selector(s) and the card wrapper selector(s).",
+        "Defensive CSS targets the actual card elements and wrappers used by the solitaire UI (including data attributes and existing utility classes).",
+        "No new visual regressions appear in non-card UI elements (dialogs, buttons, header) due to overly broad CSS selectors."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Refine and extend card-specific defensive CSS for .solitaire-card / [data-card=\"true\"] and .solitaire-card-wrapper / [data-card-wrapper] to explicitly neutralize reflection/compositing-prone properties (e.g., -webkit-box-reflect, filter/backdrop-filter, mix-blend-mode, perspective/transform-style/backface-visibility) while keeping selectors tightly scoped to solitaire card surfaces only."
+        },
+        {
+          "path": "frontend/src/features/solitaire/components/PileView.tsx",
+          "operation": "modify",
+          "description": "Confirm the actual wrappers used for all pile types include the intended attributes/classes so the global defensive CSS targets the real DOM structure (including tableau absolute-position wrappers and foundation/waste wrappers)."
+        },
+        {
+          "path": "frontend/src/features/solitaire/components/CardView.tsx",
+          "operation": "modify",
+          "description": "Ensure the rendered card root retains the canonical selectors (solitaire-card and data-card=\"true\") so global defensive CSS reliably applies to all card instances, including during dragging."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Verify and adjust the Tailwind shadow token used by cards (shadow-card) to a safe, subtle box-shadow consistent across face-up and face-down cards.",
+      "acceptanceCriteria": [
+        "The card shadow uses a conventional box-shadow (no filters) and renders consistently in Chrome/Edge without reflective artifacts.",
+        "Face-up and face-down cards both use the same safe shadow approach (or a deliberately chosen, safe variant) with consistent visual weight.",
+        "Any Tailwind theme/shadow changes do not break other components that rely on existing shadow tokens."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Update the shadow-card Tailwind token to a conventional, subtle box-shadow value designed to avoid Chromium reflection-like artifacts (no filter-based shadows), keeping the token name stable to avoid breaking other usages."
+        },
+        {
+          "path": "frontend/src/features/solitaire/components/CardView.tsx",
+          "operation": "modify",
+          "description": "Verify both face-up and face-down card variants use the same shadow-card token (or an explicitly chosen safe variant) and do not introduce additional shadow/filter effects during hover/active/drag states."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add/adjust any card-scoped CSS overrides needed to ensure the card shadow remains a standard box-shadow presentation in Chromium (e.g., explicitly neutralize filter/backdrop-filter on card surfaces so the Tailwind shadow token is not visually altered)."
         }
       ]
     }

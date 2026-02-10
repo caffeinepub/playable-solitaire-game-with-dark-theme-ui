@@ -81,15 +81,17 @@ export default function PileView({
     const canDrag = isDraggable ? isDraggable(cardIndex) : false;
 
     return (
-      <CardView
-        card={topCard}
-        onClick={onCardClick ? () => onCardClick(cardIndex) : undefined}
-        isSelected={selectedIndex === cardIndex}
-        isHinted={hintedIndex === cardIndex}
-        isDraggable={canDrag}
-        onDragStart={onDragStart ? (event) => onDragStart(cardIndex, event) : undefined}
-        onDragEnd={onDragEnd}
-      />
+      <div data-card-wrapper="waste" className="solitaire-card-wrapper">
+        <CardView
+          card={topCard}
+          onClick={onCardClick ? () => onCardClick(cardIndex) : undefined}
+          isSelected={selectedIndex === cardIndex}
+          isHinted={hintedIndex === cardIndex}
+          isDraggable={canDrag}
+          onDragStart={onDragStart ? (event) => onDragStart(cardIndex, event) : undefined}
+          onDragEnd={onDragEnd}
+        />
+      </div>
     );
   }
 
@@ -123,7 +125,8 @@ export default function PileView({
 
     return (
       <div
-        className="relative"
+        data-card-wrapper="foundation"
+        className="solitaire-card-wrapper relative"
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
@@ -165,7 +168,8 @@ export default function PileView({
             return (
               <div
                 key={card.id}
-                className="absolute"
+                data-card-wrapper="tableau"
+                className="solitaire-card-wrapper absolute"
                 style={{ top: `${index * 1.5}rem` }}
               >
                 <CardView
@@ -187,7 +191,11 @@ export default function PileView({
 
   // Default: single card view
   if (cards.length > 0) {
-    return <CardView card={cards[0]} />;
+    return (
+      <div data-card-wrapper="default" className="solitaire-card-wrapper">
+        <CardView card={cards[0]} />
+      </div>
+    );
   }
 
   return null;

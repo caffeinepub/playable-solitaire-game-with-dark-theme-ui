@@ -1,33 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-09T23:35:29.430Z",
+  "generatedAt": "2026-02-10T19:41:41.486Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-43",
-        "summary": "Remove the foundation (suit space) \"locked\" behavior so foundation piles can be used as move sources again (via click-to-select and drag-and-drop), while still enforcing existing Klondike move rules.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/features/solitaire/solitaireDrag.ts",
-          "frontend/src/features/solitaire/SolitairePage.tsx",
-          "frontend/src/features/solitaire/components/PileView.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/features/solitaire/solitaireDrag.ts",
-          "frontend/src/features/solitaire/SolitairePage.tsx",
-          "frontend/src/features/solitaire/components/PileView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-44",
-        "summary": "Remove the visual lock affordance and disabled styling from foundation top cards, so foundation cards look and behave like normal interactive cards when they are draggable/selectable.",
+        "id": "REQ-1",
+        "summary": "Audit and update the solitaire card component styling so cards render without reflection/shine-like artifacts in Chromium browsers (Chrome/Edge) across all piles (stock/back-of-card, waste, foundation, tableau).",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/features/solitaire/components/CardView.tsx",
@@ -36,21 +21,50 @@
         ],
         "matchedFiles": [
           "frontend/src/features/solitaire/components/CardView.tsx",
-          "frontend/src/features/solitaire/components/PileView.tsx",
           "frontend/src/features/solitaire/SolitairePage.tsx"
         ]
       },
       {
-        "id": "REQ-45",
-        "summary": "Update the Hint behavior to include legal moves FROM foundation piles (e.g., foundation top card to a valid tableau pile), since foundations are no longer locked.",
+        "id": "REQ-2",
+        "summary": "Remove or replace any transform-based hover/active visual effects on cards and card containers that could trigger unwanted GPU compositing artifacts, while preserving clear hover/pressed affordances using non-transform styling (e.g., ring/outline/brightness).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/solitaire/solitaireHint.ts",
-          "frontend/src/features/solitaire/SolitairePage.tsx"
+          "frontend/src/features/solitaire/components/CardView.tsx",
+          "frontend/src/features/solitaire/components/PileView.tsx",
+          "frontend/src/index.css"
         ],
         "matchedFiles": [
-          "frontend/src/features/solitaire/solitaireHint.ts",
-          "frontend/src/features/solitaire/SolitairePage.tsx"
+          "frontend/src/features/solitaire/components/CardView.tsx",
+          "frontend/src/index.css"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Harden global CSS defenses specifically for the card element and its wrappers to disable reflection-causing properties (e.g., -webkit-box-reflect, filter/backdrop-filter, mix-blend-mode, 3D transform settings) without breaking legitimate styling elsewhere.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/index.css",
+          "frontend/src/features/solitaire/components/PileView.tsx",
+          "frontend/src/features/solitaire/components/CardView.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/index.css",
+          "frontend/src/features/solitaire/components/CardView.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Verify and, if needed, adjust the Tailwind shadow token used by cards (shadow-card) so it uses a standard, subtle box-shadow that does not trigger reflection-like artifacts in Chromium, and ensure shadow appearance is consistent between face-up and face-down cards.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/tailwind.config.js",
+          "frontend/src/features/solitaire/components/CardView.tsx",
+          "frontend/src/index.css"
+        ],
+        "matchedFiles": [
+          "frontend/tailwind.config.js",
+          "frontend/src/features/solitaire/components/CardView.tsx",
+          "frontend/src/index.css"
         ]
       }
     ]
@@ -62,9 +76,8 @@
     "frontend-implementation-plan.json",
     "frontend/src/features/solitaire/SolitairePage.tsx",
     "frontend/src/features/solitaire/components/CardView.tsx",
-    "frontend/src/features/solitaire/components/PileView.tsx",
-    "frontend/src/features/solitaire/solitaireDrag.ts",
-    "frontend/src/features/solitaire/solitaireHint.ts",
+    "frontend/src/index.css",
+    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

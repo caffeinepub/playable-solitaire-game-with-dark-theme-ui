@@ -37,6 +37,14 @@
         --sidebar-accent-foreground: 0.205 0 0;
         --sidebar-border: 0.922 0 0;
         --sidebar-ring: 0.708 0 0;
+        
+        /* Card-specific tokens for light theme */
+        --card-surface: 0.98 0 0;
+        --card-border: 0.85 0 0;
+        --card-suit-black: 0.15 0 0;
+        --card-suit-red: 0.50 0.25 15;
+        --card-back: 0.35 0.15 250;
+        --card-back-border: 0.30 0.15 250;
     }
 
     .dark {
@@ -72,6 +80,14 @@
         --sidebar-accent-foreground: 0.95 0.01 60;
         --sidebar-border: 0.30 0.03 240;
         --sidebar-ring: 0.75 0.15 45;
+        
+        /* Card-specific tokens for dark-theme card surface */
+        --card-surface: 0.35 0.03 240;
+        --card-border: 0.45 0.04 240;
+        --card-suit-black: 0.15 0.02 240;
+        --card-suit-red: 0.65 0.25 15;
+        --card-back: 0.35 0.15 250;
+        --card-back-border: 0.45 0.15 250;
     }
 
     * {
@@ -79,5 +95,67 @@
     }
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+/* Comprehensive defensive CSS to prevent reflection/compositing artifacts in Chromium browsers */
+@layer components {
+    /* Target all draggable elements */
+    [draggable="true"] {
+        -webkit-box-reflect: none !important;
+        transform-style: flat !important;
+        backface-visibility: hidden !important;
+        will-change: auto !important;
+        isolation: auto !important;
+    }
+    
+    /* Target card elements by class and data attribute */
+    .solitaire-card,
+    [data-card="true"] {
+        -webkit-box-reflect: none !important;
+        transform-style: flat !important;
+        backface-visibility: hidden !important;
+        perspective: none !important;
+        will-change: auto !important;
+        isolation: auto !important;
+        /* Prevent filter/backdrop-filter on cards */
+        filter: none !important;
+        backdrop-filter: none !important;
+        /* Ensure normal blending */
+        mix-blend-mode: normal !important;
+        /* Prevent transform-based effects */
+        transform: none !important;
+    }
+    
+    /* Target card wrapper elements */
+    .solitaire-card-wrapper,
+    [data-card-wrapper] {
+        -webkit-box-reflect: none !important;
+        transform-style: flat !important;
+        backface-visibility: hidden !important;
+        perspective: none !important;
+        filter: none !important;
+        backdrop-filter: none !important;
+        mix-blend-mode: normal !important;
+        will-change: auto !important;
+        isolation: auto !important;
+        /* Prevent transform-based effects on wrappers */
+        transform: none !important;
+    }
+    
+    /* Explicitly prevent hover/active transforms on cards */
+    .solitaire-card:hover,
+    .solitaire-card:active,
+    [data-card="true"]:hover,
+    [data-card="true"]:active {
+        transform: none !important;
+    }
+    
+    /* Explicitly prevent hover/active transforms on wrappers */
+    .solitaire-card-wrapper:hover,
+    .solitaire-card-wrapper:active,
+    [data-card-wrapper]:hover,
+    [data-card-wrapper]:active {
+        transform: none !important;
     }
 }

@@ -42,17 +42,18 @@ export default function CardView({
 
   return (
     <div
+      data-card="true"
       className={`
+        solitaire-card
         relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 
         ${card.faceUp 
-          ? 'bg-white border-slate-300 shadow-md' 
-          : 'bg-gradient-to-br from-blue-600 to-blue-800 border-blue-700'
+          ? 'bg-card-surface border-card-border shadow-card' 
+          : 'bg-card-back border-card-back-border shadow-card'
         }
-        ${isSelected ? 'ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-900' : ''}
-        ${isHinted ? 'ring-4 ring-green-400 ring-offset-2 ring-offset-slate-900 animate-pulse' : ''}
-        ${onClick && card.faceUp ? 'cursor-pointer hover:scale-105 active:scale-95' : ''}
+        ${isSelected ? 'ring-4 ring-amber-400 ring-offset-0' : ''}
+        ${isHinted ? 'ring-4 ring-green-400 ring-offset-0 animate-pulse' : ''}
+        ${onClick && card.faceUp ? 'cursor-pointer hover:ring-2 hover:ring-amber-300 active:ring-4 active:ring-amber-500' : ''}
         ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''}
-        transition-all duration-200
       `}
       onClick={handleClick}
       draggable={isDraggable}
@@ -61,14 +62,14 @@ export default function CardView({
     >
       {card.faceUp ? (
         <div className="absolute inset-0 p-1 sm:p-2 flex flex-col justify-between">
-          <div className={`text-sm sm:text-lg font-bold ${isRed ? 'text-red-600' : 'text-slate-900'}`}>
+          <div className={`text-sm sm:text-lg font-bold ${isRed ? 'text-card-suit-red' : 'text-card-suit-black'}`}>
             {card.rank}
             <div className="text-base sm:text-xl leading-none">{suitSymbol}</div>
           </div>
-          <div className={`text-2xl sm:text-4xl text-center ${isRed ? 'text-red-600' : 'text-slate-900'}`}>
+          <div className={`text-2xl sm:text-4xl text-center ${isRed ? 'text-card-suit-red' : 'text-card-suit-black'}`}>
             {suitSymbol}
           </div>
-          <div className={`text-sm sm:text-lg font-bold text-right ${isRed ? 'text-red-600' : 'text-slate-900'} rotate-180`}>
+          <div className={`text-sm sm:text-lg font-bold text-right ${isRed ? 'text-card-suit-red' : 'text-card-suit-black'} rotate-180`}>
             {card.rank}
             <div className="text-base sm:text-xl leading-none">{suitSymbol}</div>
           </div>

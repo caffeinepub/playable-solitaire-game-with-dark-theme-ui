@@ -47,7 +47,13 @@ export default {
                 },
                 card: {
                     DEFAULT: 'oklch(var(--card))',
-                    foreground: 'oklch(var(--card-foreground))'
+                    foreground: 'oklch(var(--card-foreground))',
+                    surface: 'oklch(var(--card-surface))',
+                    border: 'oklch(var(--card-border))',
+                    'suit-black': 'oklch(var(--card-suit-black))',
+                    'suit-red': 'oklch(var(--card-suit-red))',
+                    back: 'oklch(var(--card-back))',
+                    'back-border': 'oklch(var(--card-back-border))'
                 },
                 chart: {
                     1: 'oklch(var(--chart-1))',
@@ -73,7 +79,8 @@ export default {
                 sm: 'calc(var(--radius) - 4px)'
             },
             boxShadow: {
-                xs: '0 1px 2px 0 rgba(0,0,0,0.05)'
+                xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
+                card: '0 2px 4px 0 rgb(0 0 0 / 0.25)'
             },
             keyframes: {
                 'accordion-down': {

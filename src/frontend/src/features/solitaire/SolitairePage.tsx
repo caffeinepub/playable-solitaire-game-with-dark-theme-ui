@@ -230,7 +230,7 @@ export default function SolitairePage() {
       onDrop={handleDocumentDrop}
     >
       {/* Header */}
-      <header className="border-b border-border/40 bg-card/30 backdrop-blur-sm">
+      <header className="border-b border-border/40 bg-card/20">
         <div className="container mx-auto px-4 py-4 relative">
           <h1 className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 bg-clip-text text-transparent">
             Simple Solitaire
@@ -242,140 +242,132 @@ export default function SolitairePage() {
           </div>
         </div>
       </header>
-      
-      {/* Main Game Area */}
+
+      {/* Main game area */}
       <main className="flex-1 container mx-auto px-4 py-6 sm:py-8">
-        <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
-          {/* Controls and Timer/Moves (mobile) */}
-          <div className="space-y-3">
-            <GameControls
-              onNewGame={handleNewGameRequest}
-              onUndo={undo}
-              onHint={showHint}
-              onScores={() => setScoresDialogOpen(true)}
-              onPreferences={() => setPreferencesDialogOpen(true)}
-              canUndo={canUndo}
-            />
-            {/* Timer and Moves for mobile - centered below controls */}
-            <div className="flex justify-center gap-4 sm:hidden">
-              <GameTimer formattedTime={formattedTime} enabled={preferences.timerEnabled} />
-              <GameMoves moves={moves} enabled={preferences.moveTrackingEnabled} />
+        {/* Timer and Moves (mobile - below header) */}
+        <div className="flex sm:hidden items-center justify-center gap-4 mb-4">
+          <GameTimer formattedTime={formattedTime} enabled={preferences.timerEnabled} />
+          <GameMoves moves={moves} enabled={preferences.moveTrackingEnabled} />
+        </div>
+
+        {/* Game controls */}
+        <div className="mb-6 sm:mb-8">
+          <GameControls
+            onNewGame={handleNewGameRequest}
+            onUndo={undo}
+            onHint={showHint}
+            onScores={() => setScoresDialogOpen(true)}
+            onPreferences={() => setPreferencesDialogOpen(true)}
+            canUndo={canUndo}
+          />
+        </div>
+
+        {/* Game board */}
+        <div className="space-y-8 sm:space-y-12">
+          {/* Top row: Stock, Waste, and Foundations */}
+          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center sm:justify-start">
+            {/* Stock pile */}
+            <div
+              data-card-wrapper="stock"
+              className="solitaire-card-wrapper relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 bg-gradient-to-br from-blue-600 to-blue-800 border-blue-700 shadow-card flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-amber-300 active:ring-4 active:ring-amber-500"
+              onClick={draw}
+            >
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-4 border-blue-400/30" />
             </div>
-          </div>
-          
-          {/* Top Row: Stock, Waste, and Foundations */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center sm:justify-between items-start">
-            <div className="flex gap-3 sm:gap-4">
-              {/* Stock */}
-              <div
-                className="cursor-pointer transition-transform hover:scale-105 active:scale-95"
-                onClick={draw}
-              >
-                {gameState.stock.length > 0 ? (
-                  <PileView
-                    cards={[gameState.stock[gameState.stock.length - 1]]}
-                    emptyLabel="Stock"
-                  />
-                ) : (
-                  <div className="relative w-16 h-24 sm:w-20 sm:h-28 rounded-lg border-2 border-dashed border-border/40 bg-muted/20 flex items-center justify-center hover:border-border/60 hover:bg-muted/30 transition-colors">
-                    <span className="text-xs text-muted-foreground/50 font-medium">Reset</span>
-                  </div>
-                )}
-              </div>
-              
-              {/* Waste */}
+
+            {/* Waste pile */}
+            <PileView
+              cards={gameState.waste}
+              onCardClick={(cardIndex) => handlePileClick('waste', undefined, cardIndex)}
+              selectedIndex={selection?.type === 'waste' ? selection.cardIndex : undefined}
+              hintedIndex={hint?.from.type === 'waste' ? hint.from.cardIndex : undefined}
+              isWasteStack={true}
+              isDraggable={isWasteDraggable}
+              onDragStart={(cardIndex, event) => {
+                handleDragStart({ type: 'waste', cardIndex }, event);
+              }}
+              onDragEnd={handleDragEnd}
+            />
+
+            {/* Spacer */}
+            <div className="hidden sm:block w-4" />
+
+            {/* Foundation piles */}
+            {gameState.foundations.map((foundation, index) => (
               <PileView
-                cards={gameState.waste}
-                onCardClick={() => handlePileClick('waste')}
-                selectedIndex={selection?.type === 'waste' ? gameState.waste.length - 1 : undefined}
-                hintedIndex={isHinted('waste') ? gameState.waste.length - 1 : undefined}
-                isWasteStack={true}
-                emptyLabel="Waste"
-                isDraggable={isWasteDraggable}
-                onDragStart={(index, event) => {
-                  handleDragStart({ type: 'waste', cardIndex: index }, event);
+                key={index}
+                cards={foundation}
+                onCardClick={(cardIndex) => handlePileClick('foundation', index, cardIndex)}
+                selectedIndex={selection?.type === 'foundation' && selection.index === index ? selection.cardIndex : undefined}
+                hintedIndex={
+                  hint?.from.type === 'foundation' && hint.from.index === index
+                    ? hint.from.cardIndex
+                    : hint?.to.type === 'foundation' && hint.to.index === index
+                    ? -1
+                    : undefined
+                }
+                isEmpty={true}
+                emptyLabel={['A', 'A', 'A', 'A'][index]}
+                isFoundationStack={true}
+                isDropTarget={true}
+                onDragOver={handleDragOver('foundation', index)}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop('foundation', index)}
+                isDraggedOver={dragOverTarget?.type === 'foundation' && dragOverTarget.index === index}
+                isDraggable={isFoundationDraggable(index)}
+                onDragStart={(cardIndex, event) => {
+                  handleDragStart({ type: 'foundation', index, cardIndex }, event);
                 }}
                 onDragEnd={handleDragEnd}
               />
-            </div>
-            
-            {/* Foundations */}
-            <div className="flex gap-3 sm:gap-4">
-              {gameState.foundations.map((foundation, index) => (
-                <PileView
-                  key={index}
-                  cards={foundation}
-                  onCardClick={() => handlePileClick('foundation', index, foundation.length - 1)}
-                  selectedIndex={selection?.type === 'foundation' && selection.index === index ? foundation.length - 1 : undefined}
-                  hintedIndex={isHinted('foundation', index, -1) ? -1 : isHinted('foundation', index, foundation.length - 1) ? foundation.length - 1 : undefined}
-                  isEmpty={true}
-                  emptyLabel={['♥', '♦', '♣', '♠'][index]}
-                  isFoundationStack={true}
-                  isDropTarget={true}
-                  onDragOver={handleDragOver('foundation', index)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop('foundation', index)}
-                  isDraggable={isFoundationDraggable(index)}
-                  onDragStart={(cardIndex, event) => {
-                    handleDragStart({ type: 'foundation', index, cardIndex }, event);
-                  }}
-                  onDragEnd={handleDragEnd}
-                  isDraggedOver={dragOverTarget?.type === 'foundation' && dragOverTarget.index === index}
-                />
-              ))}
-            </div>
+            ))}
           </div>
-          
-          {/* Tableau */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center sm:justify-between">
-            {gameState.tableau.map((pile, pileIndex) => (
+
+          {/* Tableau piles */}
+          <div className="flex flex-wrap gap-3 sm:gap-4 justify-center sm:justify-start">
+            {gameState.tableau.map((pile, index) => (
               <PileView
-                key={pileIndex}
+                key={index}
                 cards={pile}
-                onCardClick={(cardIndex) => handlePileClick('tableau', pileIndex, cardIndex)}
-                selectedIndex={
-                  selection?.type === 'tableau' &&
-                  selection.index === pileIndex
-                    ? selection.cardIndex
-                    : undefined
-                }
+                onCardClick={(cardIndex) => handlePileClick('tableau', index, cardIndex)}
+                selectedIndex={selection?.type === 'tableau' && selection.index === index ? selection.cardIndex : undefined}
                 hintedIndex={
-                  hint?.from.type === 'tableau' && hint.from.index === pileIndex
+                  hint?.from.type === 'tableau' && hint.from.index === index
                     ? hint.from.cardIndex
-                    : isHinted('tableau', pileIndex, -1) 
-                    ? -1 
+                    : hint?.to.type === 'tableau' && hint.to.index === index
+                    ? -1
                     : undefined
                 }
                 isEmpty={true}
                 emptyLabel="K"
                 isTableau={true}
                 isDropTarget={true}
-                onDragOver={handleDragOver('tableau', pileIndex)}
+                onDragOver={handleDragOver('tableau', index)}
                 onDragLeave={handleDragLeave}
-                onDrop={handleDrop('tableau', pileIndex)}
-                isDraggable={isTableauDraggable(pileIndex)}
+                onDrop={handleDrop('tableau', index)}
+                isDraggedOver={dragOverTarget?.type === 'tableau' && dragOverTarget.index === index}
+                isDraggable={isTableauDraggable(index)}
                 onDragStart={(cardIndex, event) => {
-                  handleDragStart({ type: 'tableau', index: pileIndex, cardIndex }, event);
+                  handleDragStart({ type: 'tableau', index, cardIndex }, event);
                 }}
                 onDragEnd={handleDragEnd}
-                isDraggedOver={dragOverTarget?.type === 'tableau' && dragOverTarget.index === pileIndex}
               />
             ))}
           </div>
         </div>
       </main>
-      
+
       {/* Footer */}
-      <footer className="border-t border-border/40 bg-card/30 backdrop-blur-sm py-6">
+      <footer className="border-t border-border/40 bg-card/20 py-6">
         <div className="container mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Simple Solitaire
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Built with ❤️ using{' '}
+            <p className="text-sm text-muted-foreground text-center sm:text-left">
+              © {new Date().getFullYear()} Built with ❤️ using{' '}
               <a
-                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
+                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(
+                  typeof window !== 'undefined' ? window.location.hostname : 'solitaire-app'
+                )}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-amber-400 hover:text-amber-300 transition-colors"
@@ -385,11 +377,11 @@ export default function SolitairePage() {
             </p>
             <div className="flex items-center gap-4">
               <a
-                href="https://twitter.com"
+                href="https://x.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-amber-400 transition-colors"
-                aria-label="Twitter"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="X (Twitter)"
               >
                 <SiX className="w-5 h-5" />
               </a>
@@ -397,7 +389,7 @@ export default function SolitairePage() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-amber-400 transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Facebook"
               >
                 <SiFacebook className="w-5 h-5" />
@@ -406,7 +398,7 @@ export default function SolitairePage() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-amber-400 transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Instagram"
               >
                 <SiInstagram className="w-5 h-5" />
@@ -415,7 +407,7 @@ export default function SolitairePage() {
           </div>
         </div>
       </footer>
-      
+
       {/* Dialogs */}
       <WinDialog
         open={isWon}
@@ -428,7 +420,7 @@ export default function SolitairePage() {
         timerEnabled={preferences.timerEnabled}
         moveTrackingEnabled={preferences.moveTrackingEnabled}
       />
-      
+
       <ScoresDialog
         open={scoresDialogOpen}
         onOpenChange={setScoresDialogOpen}
@@ -436,7 +428,7 @@ export default function SolitairePage() {
         bestMoves={bestMoves}
         formatTime={formatTime}
       />
-      
+
       <NewGamePreferencesDialog
         open={newGameDialogOpen}
         onOpenChange={setNewGameDialogOpen}
@@ -445,7 +437,7 @@ export default function SolitairePage() {
         defaultMoveTrackingEnabled={preferences.moveTrackingEnabled}
         defaultAskAgain={preferences.askAgain}
       />
-      
+
       <GamePreferencesDialog
         open={preferencesDialogOpen}
         onOpenChange={setPreferencesDialogOpen}

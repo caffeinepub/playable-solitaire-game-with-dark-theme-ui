@@ -1,18 +1,40 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-09T23:35:29.427Z",
-  "summary": "Diff implements the requested removal of foundation-lock behavior by (1) allowing drag payloads from foundations, (2) rendering foundation top cards with normal interactive CardView behavior (click/drag handlers) and removing lock/disabled styling, and (3) updating the Hint system to include foundation-to-tableau legal moves.",
+  "generatedAt": "2026-02-10T19:41:41.483Z",
+  "summary": "Diff updates the solitaire card component to use stable selectors and ring-based hover/active styles (no transforms), adds defensive global CSS to neutralize reflection/compositing-related properties on cards (and draggable elements), and adjusts Tailwind's `shadow-card` to a conventional box-shadow. Diff also includes additional, non-requested changes to SolitairePage behavior/props and broader theme/token updates beyond card-specific fixes.",
   "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.74,
+  "hallucinated_features": [
+    {
+      "description": "Expanded SolitairePage logic unrelated to card reflection fixes (timer/results recording, preferences/new-game dialog flow, typed prop adjustments, additional UI imports).",
+      "reason": "BuildRequest is strictly about card styling/compositing artifacts and Tailwind shadow token; these gameplay/UI-state changes are not requested and risk scope creep.",
+      "evidence": [
+        "frontend/src/features/solitaire/SolitairePage.tsx"
+      ]
+    },
+    {
+      "description": "Broad global theme/token redesign (extensive OKLCH color system changes for light/dark themes) beyond card-specific artifact mitigation.",
+      "reason": "Non-goal states not to redesign the overall page theme beyond what is necessary for the artifact fix; the diff shows large-scale color token changes not clearly limited to the card component.",
+      "evidence": [
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
+      ]
+    },
+    {
+      "description": "Defensive CSS applied to all draggable elements globally (`[draggable=\"true\"]`) rather than being limited to card elements/wrappers.",
+      "reason": "REQ-3 calls for defenses specifically for the card element and its wrappers and warns against overly broad selectors that could affect non-card UI; the diff adds a global draggable selector that may impact other draggable UI (if any).",
+      "evidence": [
+        "frontend/src/index.css"
+      ]
+    }
+  ],
+  "confidence": 0.68,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/features/solitaire/SolitairePage.tsx",
     "frontend/src/features/solitaire/components/CardView.tsx",
-    "frontend/src/features/solitaire/components/PileView.tsx",
-    "frontend/src/features/solitaire/solitaireDrag.ts",
-    "frontend/src/features/solitaire/solitaireHint.ts",
+    "frontend/src/index.css",
+    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }
